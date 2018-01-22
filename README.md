@@ -1,4 +1,4 @@
-# Ice to Plain
+# Ice to Plain [![npm version][npm-image]][npm-url] [![Build Status][travis-image]]
 
 Convert Ice stuff to and from plain JS objects.
 Supports `long`, `enum`, `struct`, `dictionary`, `exception` and `class`.
@@ -20,3 +20,8 @@ isEqual(someIceValue, iceFromPlain(plain));  // true
 const shallowPlain = iceToPlain(someIceValue, false);
 isEqual(someIceValue, iceFromPlain(shallowPlain, false));  // true
 ```
+
+[npm-image]: https://badge.fury.io/js/ice-to-plain.svg
+[npm-url]: https://badge.fury.io/js/ice-to-plain
+[travis-image]: https://travis-ci.org/aikoven/ice-to-plain.svg?branch=master
+[travis-url]: https://travis-ci.org/aikoven/ice-to-plain
