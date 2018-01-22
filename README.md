@@ -1,4 +1,4 @@
-# Ice to Plain [![npm version][npm-image]][npm-url] [![Build Status][travis-image]]
+# Ice to Plain [![npm version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
 Convert Ice stuff to and from plain JS objects.
 Supports `long`, `enum`, `struct`, `dictionary`, `exception` and `class`.
