@@ -1,0 +1,300 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Enum 1`] = `
+Object {
+  "@ice-type": "Test.TheEnum",
+  "value": "First",
+}
+`;
+
+exports[`Exception 1`] = `
+Object {
+  "@ice-type": "Test.TheError",
+  "stringField": "kek",
+}
+`;
+
+exports[`HashMap 1`] = `
+Object {
+  "@ice-type": "Ice.HashMap",
+  "entries": Array [
+    Object {
+      "key": Object {
+        "enumField": type {
+          "_name": "Second",
+          "_value": 1,
+        },
+        "intField": 24,
+        "stringField": "bar",
+      },
+      "value": "kek",
+    },
+    Object {
+      "key": Object {
+        "enumField": type {
+          "_name": "First",
+          "_value": 0,
+        },
+        "intField": 42,
+        "stringField": "foo",
+      },
+      "value": "lol",
+    },
+  ],
+}
+`;
+
+exports[`Long 1`] = `
+Object {
+  "@ice-type": "Ice.Long",
+  "value": 1099511627776,
+}
+`;
+
+exports[`Long 2`] = `
+Object {
+  "@ice-type": "Ice.Long",
+  "high": 20000000,
+  "low": 0,
+}
+`;
+
+exports[`Map with bool keys 1`] = `
+Object {
+  "@ice-type": "Map",
+  "entries": Object {
+    "false": Object {
+      "classField": Object {
+        "longField": Long {
+          "high": 0,
+          "low": 321,
+        },
+      },
+      "longField": Long {
+        "high": 0,
+        "low": 123,
+      },
+    },
+    "true": Object {
+      "classField": Object {
+        "longField": Long {
+          "high": 0,
+          "low": 24,
+        },
+      },
+      "longField": Long {
+        "high": 0,
+        "low": 42,
+      },
+    },
+  },
+}
+`;
+
+exports[`Map with int keys 1`] = `
+Object {
+  "@ice-type": "Map",
+  "entries": Object {
+    "-1": Object {
+      "classField": Object {
+        "longField": Long {
+          "high": 0,
+          "low": 321,
+        },
+      },
+      "longField": Long {
+        "high": 0,
+        "low": 123,
+      },
+    },
+    "1": Object {
+      "classField": Object {
+        "longField": Long {
+          "high": 0,
+          "low": 24,
+        },
+      },
+      "longField": Long {
+        "high": 0,
+        "low": 42,
+      },
+    },
+  },
+}
+`;
+
+exports[`Map with string keys 1`] = `
+Object {
+  "@ice-type": "Map",
+  "entries": Object {
+    "\\"kek\\"": Object {
+      "classField": Object {
+        "longField": Long {
+          "high": 0,
+          "low": 321,
+        },
+      },
+      "longField": Long {
+        "high": 0,
+        "low": 123,
+      },
+    },
+    "\\"lol\\"": Object {
+      "classField": Object {
+        "longField": Long {
+          "high": 0,
+          "low": 24,
+        },
+      },
+      "longField": Long {
+        "high": 0,
+        "low": 42,
+      },
+    },
+  },
+}
+`;
+
+exports[`Struct 1`] = `
+Object {
+  "@ice-type": "Test.TheStruct",
+  "classField": Object {
+    "longField": Long {
+      "high": 0,
+      "low": 24,
+    },
+  },
+  "longField": Long {
+    "high": 0,
+    "low": 42,
+  },
+}
+`;
+
+exports[`Value 1`] = `
+Object {
+  "@ice-type": "Test.SmallClass",
+  "longField": Long {
+    "high": 0,
+    "low": 42,
+  },
+}
+`;
+
+exports[`recursive 1`] = `
+Object {
+  "array": Array [
+    Object {
+      "@ice-type": "Test.TheEnum",
+      "value": "First",
+    },
+    Object {
+      "@ice-type": "Test.SmallClass",
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 42,
+      },
+    },
+  ],
+  "bool": true,
+  "int": 42,
+  "nested": Object {
+    "error": Object {
+      "@ice-type": "Test.TheError",
+      "stringField": "kek",
+    },
+    "struct": Object {
+      "@ice-type": "Test.TheStruct",
+      "classField": Object {
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 24,
+        },
+      },
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 42,
+      },
+    },
+  },
+  "null": null,
+  "rich": Object {
+    "@ice-type": "Test.RichClass",
+    "enumField": Object {
+      "@ice-type": "Test.TheEnum",
+      "value": "Second",
+    },
+    "longField": Object {
+      "@ice-type": "Ice.Long",
+      "high": 20000000,
+      "low": 0,
+    },
+    "primitiveKeyDictField": Object {
+      "@ice-type": "Map",
+      "entries": Object {
+        "\\"foo\\"": Object {
+          "@ice-type": "Test.TheStruct",
+          "classField": null,
+          "longField": Object {
+            "@ice-type": "Ice.Long",
+            "value": 0,
+          },
+        },
+      },
+    },
+    "primitiveSeqField": Array [
+      "lol",
+      "kek",
+    ],
+    "smallClassSeqField": Array [
+      Object {
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 42,
+        },
+      },
+      Object {
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 24,
+        },
+      },
+    ],
+    "structField": Object {
+      "@ice-type": "Test.TheStruct",
+      "classField": Object {
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 24,
+        },
+      },
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 42,
+      },
+    },
+    "structSeqField": Array [
+      Object {
+        "@ice-type": "Test.TheStruct",
+        "classField": Object {
+          "@ice-type": "Test.SmallClass",
+          "longField": Object {
+            "@ice-type": "Ice.Long",
+            "value": 24,
+          },
+        },
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 42,
+        },
+      },
+    ],
+  },
+  "string": "123",
+  "undefined": undefined,
+}
+`;

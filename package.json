@@ -1,0 +1,45 @@
+{
+  "name": "ice-to-plain",
+  "version": "0.1.0",
+  "description": "Convert Ice stuff to and from plain JS objects",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "src",
+    "lib"
+  ],
+  "author": "Daniel Lytkin <dan.lytkin@gmail.com>",
+  "license": "GPL-2.0",
+  "repository": "aikoven/ice-to-plain",
+  "scripts": {
+    "clean": "rimraf lib",
+    "test": "jest",
+    "build": "tsc -P tsconfig.build.json",
+    "prepare": "npm test && npm run clean && npm run build"
+  },
+  "dependencies": {
+    "ice": "~3.7.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.0.1",
+    "@types/lodash": "^4.14.93",
+    "jest": "^22.1.4",
+    "lodash": "^4.17.4",
+    "ts-jest": "^22.0.1",
+    "typed-ice": "~3.7.3",
+    "typescript": "^2.6.2"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ]
+  }
+}

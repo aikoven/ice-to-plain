@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es2015"],
+    "declaration": true,
+    "stripInternal": true,
+    "sourceMap": true,
+    "outDir": "lib",
+    "strict": true,
+    "noUnusedLocals": true,
+    "baseUrl": ".",
+    "paths": {
+      "ice": [
+        "node_modules/typed-ice"
+      ]
+    }
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "include": [
+    "src/**/*.spec.ts"
+  ]
+}
