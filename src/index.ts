@@ -4,11 +4,12 @@ import {Ice} from 'ice';
 const typeMap = new Map<Function, string>();
 
 function isStructConstructor(constructor: Function) {
-  return constructor.prototype.equals === Ice.Identity.prototype.equals;
+  return constructor != null && constructor.prototype.equals === Ice.Identity.prototype.equals;
 }
 
 function isEnumConstructor(constructor: Function) {
   return (
+    constructor != null &&
     constructor.prototype.equals === Ice.EnumBase.prototype.equals &&
     constructor !== Ice.EnumBase
   );
