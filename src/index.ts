@@ -206,6 +206,25 @@ function hashMapFromPlain(
   return ret;
 }
 
+export const SET_TYPE = 'Set';
+
+function setToPlain(set: Set<any>, recursive = true): any {
+  const values = [...set];
+
+  return {
+    [ICE_TYPE_KEY]: SET_TYPE,
+    value: recursive ? values.map(value => iceToPlain(value, true)) : values,
+  };
+}
+
+function setFromPlain(plainSet: any, recursive = true): Set<any> {
+  const items = plainSet.value as any[];
+
+  return new Set(
+    recursive ? items.map(value => iceFromPlain(value, true)) : items,
+  );
+}
+
 function structToPlain(struct: Ice.Struct, recursive = true): any {
   const ret: any = {
     [ICE_TYPE_KEY]: getType(struct),
@@ -298,6 +317,10 @@ export function iceToPlain(iceValue: any, recursive = true): any {
     return hashMapToPlain(iceValue, recursive);
   }
 
+  if (iceValue instanceof Set) {
+    return setToPlain(iceValue, recursive);
+  }
+
   if (isStructConstructor(iceValue.constructor)) {
     return structToPlain(iceValue, recursive);
   }
@@ -344,6 +367,10 @@ export function iceFromPlain(plainValue: any, recursive = true): any {
 
   if (iceType === HASH_MAP_TYPE) {
     return hashMapFromPlain(plainValue, recursive);
+  }
+
+  if (iceType === SET_TYPE) {
+    return setFromPlain(plainValue, recursive);
   }
 
   if (iceType.endsWith('Prx')) {

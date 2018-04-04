@@ -103,6 +103,14 @@ test('HashMap', () => {
   expect(hashMap.equals(iceFromPlain(hashMapPlain, false), isEqual)).toBe(true);
 });
 
+test('Set', () => {
+  const set = new Set([1, 2, 3]);
+
+  const setPlain = iceToPlain(set, false);
+  expect(setPlain).toMatchSnapshot();
+  expectEqual(iceFromPlain(setPlain, false), set);
+});
+
 test('Struct', () => {
   const struct = new Test.TheStruct(
     new Ice.Long(42),

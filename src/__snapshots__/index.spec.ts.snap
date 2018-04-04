@@ -162,6 +162,17 @@ Object {
 }
 `;
 
+exports[`Set 1`] = `
+Object {
+  "@ice-type": "Set",
+  "value": Array [
+    1,
+    2,
+    3,
+  ],
+}
+`;
+
 exports[`Struct 1`] = `
 Object {
   "@ice-type": "Test.TheStruct",
