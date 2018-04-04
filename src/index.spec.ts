@@ -130,6 +130,18 @@ test('Value', () => {
   expectEqual(iceFromPlain(valuePlain, false), value);
 });
 
+test('Proxy', () => {
+  const communicator = Ice.initialize();
+  const proxy = Ice.LocatorPrx.uncheckedCast(
+    communicator.stringToProxy('Category/Name:tcp -h blabla -p 1234')!,
+  );
+
+  const proxyPlain = iceToPlain(proxy, false);
+  expect(proxyPlain).toMatchSnapshot();
+
+  expect(() => iceFromPlain(proxyPlain, false)).toThrowError();
+});
+
 test('recursive', () => {
   const obj = {
     string: '123',

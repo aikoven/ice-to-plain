@@ -4,7 +4,10 @@ import {Ice} from 'ice';
 const typeMap = new Map<Function, string>();
 
 function isStructConstructor(constructor: Function) {
-  return constructor != null && constructor.prototype.equals === Ice.Identity.prototype.equals;
+  return (
+    constructor != null &&
+    constructor.prototype.equals === Ice.Identity.prototype.equals
+  );
 }
 
 function isEnumConstructor(constructor: Function) {
@@ -107,6 +110,21 @@ function enumFromPlain(
   plainEnum: any,
 ): Ice.EnumBase<string> {
   return constructor[plainEnum.value];
+}
+
+function proxyToPlain(proxy: Ice.ObjectPrx): any {
+  const proxyType = proxy.constructor as Ice.ObjectPrxConstructor<
+    Ice.ObjectPrx
+  >;
+  const type = proxyType
+    .ice_staticId()
+    .replace(/::/g, '.')
+    .slice(1);
+
+  return {
+    [ICE_TYPE_KEY]: `${type}Prx`,
+    value: proxy.toString(),
+  };
 }
 
 export const MAP_TYPE = 'Map';
@@ -288,9 +306,13 @@ export function iceToPlain(iceValue: any, recursive = true): any {
     return objectToPlain(iceValue, recursive);
   }
 
+  if (iceValue instanceof Ice.ObjectPrx) {
+    return proxyToPlain(iceValue);
+  }
+
   return recursive
     ? mapValues(iceValue, value => iceToPlain(value, true))
-    : iceValue;
+    : {...iceValue};
 }
 
 export function iceFromPlain(plainValue: any, recursive = true): any {
@@ -322,6 +344,10 @@ export function iceFromPlain(plainValue: any, recursive = true): any {
 
   if (iceType === HASH_MAP_TYPE) {
     return hashMapFromPlain(plainValue, recursive);
+  }
+
+  if (iceType.endsWith('Prx')) {
+    throw new Error('Converting proxies from plain is not supported');
   }
 
   const constructor = getConstructor(iceType);
