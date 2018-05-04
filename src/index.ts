@@ -191,10 +191,13 @@ function hashMapToPlain(
 function hashMapFromPlain(
   plainHashMap: any,
   recursive = true,
-): Ice.HashMap<Ice.HashMapKey, any> {
+): Ice.HashMap<{equals(other: any): boolean; hashCode(): number}, any> {
   const {entries} = plainHashMap;
 
-  const ret = new Ice.HashMap<Ice.HashMapKey, any>();
+  const ret = new Ice.HashMap<
+    {equals(other: any): boolean; hashCode(): number},
+    any
+  >(Ice.HashMap.compareEquals);
 
   for (const {key, value} of entries) {
     ret.set(

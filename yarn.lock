@@ -2681,9 +2681,9 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typed-ice@~3.7.3:
-  version "3.7.3"
-  resolved "https://registry.yarnpkg.com/typed-ice/-/typed-ice-3.7.3.tgz#ce5be825cc436eb043972e1cf78d33c39c1f0115"
+typed-ice@^3.7.6:
+  version "3.7.6"
+  resolved "https://registry.yarnpkg.com/typed-ice/-/typed-ice-3.7.6.tgz#47356f7a49c8131caf2ce7c863698f09cf5f0430"
 
 typescript@^2.6.2:
   version "2.6.2"
