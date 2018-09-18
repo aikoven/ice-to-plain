@@ -46,4 +46,18 @@ module Test {
 
     StringKeyDict primitiveKeyDictField;
   };
+
+  module Keywords {
+    struct Await {
+      int import;
+    };
+
+    class Break {};
+
+    enum E {
+      TRY
+    };
+
+    dictionary<string, int> Catch;
+  };
 };

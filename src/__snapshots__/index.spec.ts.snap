@@ -199,6 +199,26 @@ Object {
 }
 `;
 
+exports[`keywords 1`] = `
+Object {
+  "await": Object {
+    "@ice-type": "Test.Keywords._Await",
+    "_import": 1,
+  },
+  "break": Object {
+    "@ice-type": "Test.Keywords._Break",
+  },
+  "catch": Object {
+    "@ice-type": "Map",
+    "entries": Object {},
+  },
+  "try": Object {
+    "@ice-type": "Test.Keywords.E",
+    "value": "_TRY",
+  },
+}
+`;
+
 exports[`recursive 1`] = `
 Object {
   "array": Array [

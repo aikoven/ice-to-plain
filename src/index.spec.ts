@@ -191,3 +191,16 @@ test('recursive', () => {
   expect(objPlain).toMatchSnapshot();
   expectEqual(iceFromPlain(objPlain, true), obj);
 });
+
+test('keywords', () => {
+  const obj = {
+    await: new Test.Keywords._Await(1),
+    break: new Test.Keywords._Break(),
+    try: Test.Keywords.E._TRY,
+    catch: new Test.Keywords._Catch(),
+  };
+
+  const objPlain = iceToPlain(obj, true);
+  expect(objPlain).toMatchSnapshot();
+  expectEqual(iceFromPlain(objPlain, true), obj);
+});

@@ -47,12 +47,33 @@ declare module "./Test.ns" {
     }
 
     type StringKeyDict = Map<string, TheStruct>;
+    const StringKeyDict: {
+      new (entries?: ReadonlyArray<[string, TheStruct]>): Map<
+        string,
+        TheStruct
+      >;
+    };
 
     type BoolKeyDict = Map<boolean, TheStruct>;
+    const BoolKeyDict: {
+      new (entries?: ReadonlyArray<[boolean, TheStruct]>): Map<
+        boolean,
+        TheStruct
+      >;
+    };
 
     type IntKeyDict = Map<number, TheStruct>;
+    const IntKeyDict: {
+      new (entries?: ReadonlyArray<[number, TheStruct]>): Map<
+        number,
+        TheStruct
+      >;
+    };
 
     type StructKeyDict = Ice.HashMap<KeyStruct, string>;
+    const StructKeyDict: {
+      new (): Ice.HashMap<KeyStruct, string>;
+    };
 
     class TheError extends Ice.UserException {
       constructor(stringField?: string);
@@ -77,6 +98,31 @@ declare module "./Test.ns" {
       smallClassSeqField: SmallClassSeq;
       structSeqField: StructSeq;
       primitiveKeyDictField: StringKeyDict;
+    }
+
+    namespace Keywords {
+      class _Await implements Ice.Struct {
+        constructor(_import?: number);
+
+        _import: number;
+
+        clone(): this;
+        equals(other: this): boolean;
+        hashCode(): number;
+      }
+
+      class _Break extends Ice.Value {}
+
+      type EName = "_TRY";
+
+      class E<Name extends EName = EName> extends Ice.EnumBase<Name> {
+        static _TRY: E<"_TRY">;
+      }
+
+      type _Catch = Map<string, number>;
+      const _Catch: {
+        new (entries?: ReadonlyArray<[string, number]>): Map<string, number>;
+      };
     }
   }
 }

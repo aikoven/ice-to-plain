@@ -265,6 +265,10 @@ function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
   return ret;
 }
 
+const internalFields = new Set([
+  '_inToStringAlready', // exceptions
+]);
+
 function objectToPlain(
   value: Ice.Value | Ice.Exception | Ice.Struct,
   recursive = true,
@@ -274,7 +278,7 @@ function objectToPlain(
   };
 
   for (const key of Object.keys(value)) {
-    if (key[0] === '_') {
+    if (internalFields.has(key)) {
       continue;
     }
 
