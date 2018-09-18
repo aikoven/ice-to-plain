@@ -1,20 +1,29 @@
 import {Ice} from 'ice';
 
-// maps constructor functions to type paths (Module.Type) for structs and enums
+import Long = Ice.Long;
+import EnumBase = Ice.EnumBase;
+import HashMap = Ice.HashMap;
+import Value = Ice.Value;
+import Exception = Ice.Exception;
+import ObjectPrx = Ice.ObjectPrx;
+import Identity = Ice.Identity;
+
+// maps constructor functions to type paths (Module.Type)
+// for structs, enums, values, exceptions and proxies
 const typeMap = new Map<Function, string>();
 
 function isStructConstructor(constructor: Function) {
   return (
     constructor != null &&
-    constructor.prototype.equals === Ice.Identity.prototype.equals
+    constructor.prototype.equals === Identity.prototype.equals
   );
 }
 
 function isEnumConstructor(constructor: Function) {
   return (
     constructor != null &&
-    constructor.prototype.equals === Ice.EnumBase.prototype.equals &&
-    constructor !== Ice.EnumBase
+    constructor.prototype.equals === EnumBase.prototype.equals &&
+    constructor !== EnumBase
   );
 }
 
@@ -27,12 +36,20 @@ function cacheConstructors(iceModule?: any, prefix?: string) {
   for (const name of Object.keys(iceModule)) {
     const value = iceModule[name];
 
+    const typePath = prefix == null ? name : `${prefix}.${name}`;
+
     if (value.constructor === Object) {
       // value is a module
-      cacheConstructors(value, prefix == null ? name : `${prefix}.${name}`);
+      cacheConstructors(value, typePath);
     } else if (typeof value === 'function') {
-      if (isStructConstructor(value) || isEnumConstructor(value)) {
-        typeMap.set(value, prefix == null ? name : `${prefix}.${name}`);
+      if (
+        isStructConstructor(value) ||
+        isEnumConstructor(value) ||
+        value.prototype instanceof Value ||
+        value.prototype instanceof Exception ||
+        value.prototype instanceof ObjectPrx
+      ) {
+        typeMap.set(value, typePath);
       }
     }
   }
@@ -40,16 +57,23 @@ function cacheConstructors(iceModule?: any, prefix?: string) {
 
 cacheConstructors();
 
-function getType(enumOrStruct: any): string {
-  let type = typeMap.get(enumOrStruct.constructor);
+function getType(
+  value:
+    | Ice.Value
+    | Ice.Exception
+    | Ice.Struct
+    | Ice.EnumBase<string>
+    | Ice.ObjectPrx,
+): string {
+  let type = typeMap.get(value.constructor);
 
   if (type == null) {
     cacheConstructors();
-    type = typeMap.get(enumOrStruct.constructor);
+    type = typeMap.get(value.constructor);
   }
 
   if (type == null) {
-    throw new Error(`Could not find type for ${JSON.stringify(enumOrStruct)}`);
+    throw new Error(`Could not find type for ${JSON.stringify(value)}`);
   }
 
   return type;
@@ -65,9 +89,11 @@ function getConstructor(type: string): any {
   return constructor;
 }
 
-export const ICE_TYPE_KEY = '@ice-type';
+const ICE_TYPE_KEY = '@ice-type';
+export {ICE_TYPE_KEY};
 
-export const LONG_TYPE = 'Ice.Long';
+const LONG_TYPE = 'Ice.Long';
+export {LONG_TYPE};
 
 function longToPlain(long: Ice.Long) {
   // serialize to number if possible
@@ -92,9 +118,9 @@ function longToPlain(long: Ice.Long) {
 
 function longFromPlain(plainLong: any): Ice.Long {
   if (plainLong.value != null) {
-    return new Ice.Long(plainLong.value);
+    return new Long(plainLong.value);
   } else {
-    return new Ice.Long(plainLong.high, plainLong.low);
+    return new Long(plainLong.high, plainLong.low);
   }
 }
 
@@ -113,21 +139,14 @@ function enumFromPlain(
 }
 
 function proxyToPlain(proxy: Ice.ObjectPrx): any {
-  const proxyType = proxy.constructor as Ice.ObjectPrxConstructor<
-    Ice.ObjectPrx
-  >;
-  const type = proxyType
-    .ice_staticId()
-    .replace(/::/g, '.')
-    .slice(1);
-
   return {
-    [ICE_TYPE_KEY]: `${type}Prx`,
+    [ICE_TYPE_KEY]: getType(proxy),
     value: proxy.toString(),
   };
 }
 
-export const MAP_TYPE = 'Map';
+const MAP_TYPE = 'Map';
+export {MAP_TYPE};
 
 function mapToPlain(
   map: Map<string | number | boolean, any>,
@@ -165,7 +184,8 @@ function mapFromPlain(
   return ret;
 }
 
-export const HASH_MAP_TYPE = 'Ice.HashMap';
+const HASH_MAP_TYPE = 'Ice.HashMap';
+export {HASH_MAP_TYPE};
 
 function hashMapToPlain(
   hashMap: Ice.HashMap<Ice.HashMapKey, any>,
@@ -194,10 +214,10 @@ function hashMapFromPlain(
 ): Ice.HashMap<{equals(other: any): boolean; hashCode(): number}, any> {
   const {entries} = plainHashMap;
 
-  const ret = new Ice.HashMap<
+  const ret = new HashMap<
     {equals(other: any): boolean; hashCode(): number},
     any
-  >(Ice.HashMap.compareEquals);
+  >(HashMap.compareEquals);
 
   for (const {key, value} of entries) {
     ret.set(
@@ -209,35 +229,22 @@ function hashMapFromPlain(
   return ret;
 }
 
-export const SET_TYPE = 'Set';
+const SET_TYPE = 'Set';
+export {SET_TYPE};
 
 function setToPlain(set: Set<any>, recursive = true): any {
   const values = [...set];
 
   return {
     [ICE_TYPE_KEY]: SET_TYPE,
-    value: recursive ? values.map(value => iceToPlain(value, true)) : values,
+    value: recursive ? values.map(iceToPlainRecursive) : values,
   };
 }
 
 function setFromPlain(plainSet: any, recursive = true): Set<any> {
   const items = plainSet.value as any[];
 
-  return new Set(
-    recursive ? items.map(value => iceFromPlain(value, true)) : items,
-  );
-}
-
-function structToPlain(struct: Ice.Struct, recursive = true): any {
-  const ret: any = {
-    [ICE_TYPE_KEY]: getType(struct),
-  };
-
-  for (const key of Object.keys(struct) as Array<keyof Ice.Struct>) {
-    ret[key] = recursive ? iceToPlain(struct[key]) : struct[key];
-  }
-
-  return ret;
+  return new Set(recursive ? items.map(iceFromPlainRecursive) : items);
 }
 
 function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
@@ -259,22 +266,21 @@ function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
 }
 
 function objectToPlain(
-  value: Ice.Value | Ice.Exception,
+  value: Ice.Value | Ice.Exception | Ice.Struct,
   recursive = true,
 ): any {
   const ret: any = {
-    [ICE_TYPE_KEY]: value
-      .ice_id()
-      .replace(/::/g, '.')
-      .slice(1),
+    [ICE_TYPE_KEY]: getType(value),
   };
 
-  for (const key of Object.keys(value) as Array<keyof Ice.Value>) {
-    if (key.startsWith('_')) {
+  for (const key of Object.keys(value)) {
+    if (key[0] === '_') {
       continue;
     }
 
-    ret[key] = recursive ? iceToPlain(value[key]) : value[key];
+    ret[key] = recursive
+      ? iceToPlain((value as any)[key])
+      : (value as any)[key];
   }
 
   return ret;
@@ -293,30 +299,30 @@ function mapValues(
   return ret;
 }
 
+const iceToPlainRecursive = (value: any) => iceToPlain(value, true);
+
 export function iceToPlain(iceValue: any, recursive = true): any {
   if (iceValue === null || typeof iceValue !== 'object') {
     return iceValue;
   }
 
-  if (iceValue instanceof Ice.Long) {
+  if (iceValue instanceof Long) {
     return longToPlain(iceValue);
   }
 
-  if (iceValue instanceof Ice.EnumBase) {
+  if (iceValue instanceof EnumBase) {
     return enumToPlain(iceValue);
   }
 
   if (Array.isArray(iceValue)) {
-    return recursive
-      ? iceValue.map(value => iceToPlain(value, true))
-      : iceValue;
+    return recursive ? iceValue.map(iceToPlainRecursive) : iceValue;
   }
 
   if (iceValue instanceof Map) {
     return mapToPlain(iceValue, recursive);
   }
 
-  if (iceValue instanceof Ice.HashMap) {
+  if (iceValue instanceof HashMap) {
     return hashMapToPlain(iceValue, recursive);
   }
 
@@ -324,22 +330,22 @@ export function iceToPlain(iceValue: any, recursive = true): any {
     return setToPlain(iceValue, recursive);
   }
 
-  if (isStructConstructor(iceValue.constructor)) {
-    return structToPlain(iceValue, recursive);
-  }
-
-  if (iceValue instanceof Ice.Value || iceValue instanceof Ice.Exception) {
+  if (
+    iceValue instanceof Value ||
+    iceValue instanceof Exception ||
+    isStructConstructor(iceValue.constructor)
+  ) {
     return objectToPlain(iceValue, recursive);
   }
 
-  if (iceValue instanceof Ice.ObjectPrx) {
+  if (iceValue instanceof ObjectPrx) {
     return proxyToPlain(iceValue);
   }
 
-  return recursive
-    ? mapValues(iceValue, value => iceToPlain(value, true))
-    : {...iceValue};
+  return recursive ? mapValues(iceValue, iceToPlainRecursive) : {...iceValue};
 }
+
+const iceFromPlainRecursive = (value: any) => iceFromPlain(value, true);
 
 export function iceFromPlain(plainValue: any, recursive = true): any {
   if (plainValue === null || typeof plainValue !== 'object') {
@@ -347,16 +353,14 @@ export function iceFromPlain(plainValue: any, recursive = true): any {
   }
 
   if (Array.isArray(plainValue)) {
-    return recursive
-      ? plainValue.map(value => iceFromPlain(value, true))
-      : plainValue;
+    return recursive ? plainValue.map(iceFromPlainRecursive) : plainValue;
   }
 
   const iceType: string | undefined = plainValue[ICE_TYPE_KEY];
 
   if (iceType == null) {
     return recursive
-      ? mapValues(plainValue, value => iceFromPlain(value, true))
+      ? mapValues(plainValue, iceFromPlainRecursive)
       : plainValue;
   }
 
