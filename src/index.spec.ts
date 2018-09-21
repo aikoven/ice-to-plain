@@ -1,7 +1,7 @@
 import {Ice} from 'ice';
 import {isEqual} from 'lodash';
 
-import {iceToPlain, iceFromPlain} from './index';
+import {iceToPlain, iceToJson, iceFromPlain} from './index';
 import {Test} from '../fixtures/Test';
 
 function expectEqual(v1: any, v2: any) {
@@ -17,6 +17,7 @@ test('Long', () => {
 
   const smallLongPlain = iceToPlain(smallLong);
   expect(smallLongPlain).toMatchSnapshot();
+  expect(iceToJson(smallLong)).toEqual(JSON.stringify(smallLongPlain));
   expectEqual(iceFromPlain(smallLongPlain), smallLong);
 
   // long that can't be converted to number
@@ -24,6 +25,7 @@ test('Long', () => {
 
   const largeLongPlain = iceToPlain(largeLong);
   expect(largeLongPlain).toMatchSnapshot();
+  expect(iceToJson(largeLong)).toEqual(JSON.stringify(largeLongPlain));
   expectEqual(iceFromPlain(largeLongPlain), largeLong);
 });
 
@@ -32,6 +34,7 @@ test('Enum', () => {
 
   const enumValuePlain = iceToPlain(enumValue);
   expect(enumValuePlain).toMatchSnapshot();
+  expect(iceToJson(enumValue)).toEqual(JSON.stringify(enumValuePlain));
   expectEqual(iceFromPlain(enumValuePlain), enumValue);
 });
 
@@ -49,9 +52,10 @@ test('Map with string keys', () => {
     ),
   );
 
-  const mapPlain = iceToPlain(map, false);
+  const mapPlain = iceToPlain(map);
   expect(mapPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(mapPlain, false), map);
+  expect(iceToJson(map)).toEqual(JSON.stringify(mapPlain));
+  expectEqual(iceFromPlain(mapPlain), map);
 });
 
 test('Map with bool keys', () => {
@@ -68,9 +72,10 @@ test('Map with bool keys', () => {
     ),
   );
 
-  const mapPlain = iceToPlain(map, false);
+  const mapPlain = iceToPlain(map);
   expect(mapPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(mapPlain, false), map);
+  expect(iceToJson(map)).toEqual(JSON.stringify(mapPlain));
+  expectEqual(iceFromPlain(mapPlain), map);
 });
 
 test('Map with int keys', () => {
@@ -87,9 +92,10 @@ test('Map with int keys', () => {
     ),
   );
 
-  const mapPlain = iceToPlain(map, false);
+  const mapPlain = iceToPlain(map);
   expect(mapPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(mapPlain, false), map);
+  expect(iceToJson(map)).toEqual(JSON.stringify(mapPlain));
+  expectEqual(iceFromPlain(mapPlain), map);
 });
 
 test('HashMap', () => {
@@ -98,17 +104,19 @@ test('HashMap', () => {
   hashMap.set(new Test.KeyStruct(42, 'foo', Test.TheEnum.First), 'lol');
   hashMap.set(new Test.KeyStruct(24, 'bar', Test.TheEnum.Second), 'kek');
 
-  const hashMapPlain = iceToPlain(hashMap, false);
+  const hashMapPlain = iceToPlain(hashMap);
   expect(hashMapPlain).toMatchSnapshot();
-  expect(hashMap.equals(iceFromPlain(hashMapPlain, false), isEqual)).toBe(true);
+  expect(iceToJson(hashMap)).toEqual(JSON.stringify(hashMapPlain));
+  expect(hashMap.equals(iceFromPlain(hashMapPlain), isEqual)).toBe(true);
 });
 
 test('Set', () => {
   const set = new Set([1, 2, 3]);
 
-  const setPlain = iceToPlain(set, false);
+  const setPlain = iceToPlain(set);
   expect(setPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(setPlain, false), set);
+  expect(iceToJson(set)).toEqual(JSON.stringify(setPlain));
+  expectEqual(iceFromPlain(setPlain), set);
 });
 
 test('Struct', () => {
@@ -117,25 +125,28 @@ test('Struct', () => {
     new Test.SmallClass(new Ice.Long(24)),
   );
 
-  const structPlain = iceToPlain(struct, false);
+  const structPlain = iceToPlain(struct);
   expect(structPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(structPlain, false), struct);
+  expect(iceToJson(struct)).toEqual(JSON.stringify(structPlain));
+  expectEqual(iceFromPlain(structPlain), struct);
 });
 
 test('Exception', () => {
   const exception = new Test.TheError('kek');
 
-  const exceptionPlain = iceToPlain(exception, false);
+  const exceptionPlain = iceToPlain(exception);
   expect(exceptionPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(exceptionPlain, false), exception);
+  expect(iceToJson(exception)).toEqual(JSON.stringify(exceptionPlain));
+  expectEqual(iceFromPlain(exceptionPlain), exception);
 });
 
 test('Value', () => {
   const value = new Test.SmallClass(new Ice.Long(42));
 
-  const valuePlain = iceToPlain(value, false);
+  const valuePlain = iceToPlain(value);
   expect(valuePlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(valuePlain, false), value);
+  expect(iceToJson(value)).toEqual(JSON.stringify(valuePlain));
+  expectEqual(iceFromPlain(valuePlain), value);
 });
 
 test('Proxy', () => {
@@ -144,10 +155,10 @@ test('Proxy', () => {
     communicator.stringToProxy('Category/Name:tcp -h blabla -p 1234')!,
   );
 
-  const proxyPlain = iceToPlain(proxy, false);
+  const proxyPlain = iceToPlain(proxy);
   expect(proxyPlain).toMatchSnapshot();
-
-  expect(() => iceFromPlain(proxyPlain, false)).toThrowError();
+  expect(iceToJson(proxy)).toEqual(JSON.stringify(proxyPlain));
+  expect(() => iceFromPlain(proxyPlain)).toThrowError();
 });
 
 test('recursive', () => {
@@ -187,9 +198,25 @@ test('recursive', () => {
     ),
   };
 
-  const objPlain = iceToPlain(obj, true);
+  const objPlain = iceToPlain(obj);
   expect(objPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(objPlain, true), obj);
+  expect(iceToJson(obj)).toEqual(JSON.stringify(objPlain));
+  expectEqual(iceFromPlain(objPlain), obj);
+});
+
+test('plain', () => {
+  const obj = {
+    undefined: undefined,
+    function: () => {},
+    number: 1,
+    string: 'string',
+    boolean: true,
+    null: null,
+    array: [undefined, 1, 'string', true, null, {lol: 'kek'}],
+    nested: {lol: 'kek'},
+  };
+
+  expect(iceToJson(obj)).toEqual(JSON.stringify(obj));
 });
 
 test('keywords', () => {
@@ -200,7 +227,7 @@ test('keywords', () => {
     catch: new Test.Keywords._Catch(),
   };
 
-  const objPlain = iceToPlain(obj, true);
+  const objPlain = iceToPlain(obj);
   expect(objPlain).toMatchSnapshot();
-  expectEqual(iceFromPlain(objPlain, true), obj);
+  expectEqual(iceFromPlain(objPlain), obj);
 });

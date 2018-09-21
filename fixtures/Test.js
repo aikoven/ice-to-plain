@@ -153,7 +153,7 @@ Test.TheError = class extends _ice.Ice.UserException {
 const iceC_Test_RichClass_ids = ["::Ice::Object", "::Test::RichClass", "::Test::SmallClass"];
 
 Test.RichClass = class extends Test.SmallClass {
-    constructor(longField, structField = new Test.TheStruct(), enumField = Test.TheEnum.First, primitiveSeqField = null, smallClassSeqField = null, structSeqField = null, primitiveKeyDictField = null) {
+    constructor(longField, structField = new Test.TheStruct(), enumField = Test.TheEnum.First, primitiveSeqField = null, smallClassSeqField = null, structSeqField = null, primitiveKeyDictField = null, optionalField = undefined) {
         super(longField);
         this.structField = structField;
         this.enumField = enumField;
@@ -161,6 +161,7 @@ Test.RichClass = class extends Test.SmallClass {
         this.smallClassSeqField = smallClassSeqField;
         this.structSeqField = structSeqField;
         this.primitiveKeyDictField = primitiveKeyDictField;
+        this.optionalField = optionalField;
     }
 
     _iceWriteMemberImpl(ostr) {
@@ -170,6 +171,7 @@ Test.RichClass = class extends Test.SmallClass {
         Test.SmallClassSeqHelper.write(ostr, this.smallClassSeqField);
         Test.StructSeqHelper.write(ostr, this.structSeqField);
         Test.StringKeyDictHelper.write(ostr, this.primitiveKeyDictField);
+        _ice.Ice.IntHelper.writeOptional(ostr, 1, this.optionalField);
     }
 
     _iceReadMemberImpl(istr) {
@@ -179,6 +181,7 @@ Test.RichClass = class extends Test.SmallClass {
         this.smallClassSeqField = Test.SmallClassSeqHelper.read(istr);
         this.structSeqField = Test.StructSeqHelper.read(istr);
         this.primitiveKeyDictField = Test.StringKeyDictHelper.read(istr);
+        this.optionalField = _ice.Ice.IntHelper.readOptional(istr, 1);
     }
 };
 

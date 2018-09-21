@@ -116,6 +116,20 @@ function longToPlain(long: Ice.Long) {
   }
 }
 
+function longToJson(long: Ice.Long) {
+  // serialize to number if possible
+  const value = long.toNumber();
+
+  if (
+    value !== Number.POSITIVE_INFINITY &&
+    value !== Number.NEGATIVE_INFINITY
+  ) {
+    return `{"@ice-type":"Ice.Long","value":${value}}`;
+  } else {
+    return `{"@ice-type":"Ice.Long","high":${long.high},"low":${long.low}}`;
+  }
+}
+
 function longFromPlain(plainLong: any): Ice.Long {
   if (plainLong.value != null) {
     return new Long(plainLong.value);
@@ -129,6 +143,10 @@ function enumToPlain(enumValue: Ice.EnumBase<string>): any {
     [ICE_TYPE_KEY]: getType(enumValue),
     value: enumValue.name,
   };
+}
+
+function enumToJson(enumValue: Ice.EnumBase<string>) {
+  return `{"@ice-type":"${getType(enumValue)}","value":"${enumValue.name}"}`;
 }
 
 function enumFromPlain(
@@ -145,12 +163,29 @@ function proxyToPlain(proxy: Ice.ObjectPrx): any {
   };
 }
 
+function proxyToJson(proxy: Ice.ObjectPrx) {
+  const valueJson = stringToJson(proxy.toString());
+  return `{"@ice-type":"${getType(proxy)}","value":${valueJson}}`;
+}
+
 const MAP_TYPE = 'Map';
 export {MAP_TYPE};
 
+function stringifyMapKey(key: string | number | boolean) {
+  switch (typeof key) {
+    case 'number':
+    case 'boolean':
+      return '' + key;
+    case 'string':
+      return stringToJson(key as string);
+    default:
+      return JSON.stringify(key);
+  }
+}
+
 function mapToPlain(
   map: Map<string | number | boolean, any>,
-  recursive = true,
+  customizer: Customizer,
 ): any {
   const entries: {[key: string]: any} = {};
 
@@ -160,25 +195,44 @@ function mapToPlain(
   };
 
   for (const [key, value] of map.entries()) {
-    entries[JSON.stringify(key)] = recursive ? iceToPlain(value) : value;
+    entries[stringifyMapKey(key)] = customizer(value);
   }
 
   return ret;
 }
 
+function mapToJson(
+  map: Map<string | number | boolean, any>,
+  stringifier: Stringifier,
+): string {
+  let ret = '{"@ice-type":"Map","entries":{';
+  let comma = false;
+
+  for (const [key, value] of map.entries()) {
+    const valueJson = stringifier(value);
+    if (valueJson === undefined) {
+      continue;
+    }
+    if (comma) {
+      ret += ',';
+    }
+    ret += stringToJson(stringifyMapKey(key)) + ':' + valueJson;
+    comma = true;
+  }
+
+  return ret + '}}';
+}
+
 function mapFromPlain(
   plainMap: any,
-  recursive = true,
+  customizer: Customizer,
 ): Map<string | number | boolean, any> {
   const {entries} = plainMap;
 
   const ret = new Map<string | number | boolean, any>();
 
   for (const key of Object.keys(entries)) {
-    ret.set(
-      JSON.parse(key),
-      recursive ? iceFromPlain(entries[key]) : entries[key],
-    );
+    ret.set(JSON.parse(key), customizer(entries[key]));
   }
 
   return ret;
@@ -189,7 +243,7 @@ export {HASH_MAP_TYPE};
 
 function hashMapToPlain(
   hashMap: Ice.HashMap<Ice.HashMapKey, any>,
-  recursive = true,
+  customizer: Customizer,
 ): any {
   const entries: Array<{key: any; value: any}> = [];
 
@@ -200,17 +254,45 @@ function hashMapToPlain(
 
   for (const [key, value] of hashMap.entries()) {
     entries.push({
-      key: recursive ? iceToPlain(key) : key,
-      value: recursive ? iceToPlain(value) : value,
+      key: customizer(key),
+      value: customizer(value),
     });
   }
 
   return ret;
 }
 
+function hashMapToJson(
+  hashMap: Ice.HashMap<Ice.HashMapKey, any>,
+  stringifier: Stringifier,
+): string {
+  let ret = '{"@ice-type":"Ice.HashMap","entries":[';
+  let comma = false;
+
+  for (const [key, value] of hashMap.entries()) {
+    const valueJson = stringifier(value);
+    if (valueJson === undefined) {
+      continue;
+    }
+
+    const keyJson = stringifier(key);
+    if (keyJson === undefined) {
+      continue;
+    }
+
+    if (comma) {
+      ret += ',';
+    }
+    ret += `{"key":${keyJson},"value":${valueJson}}`;
+    comma = true;
+  }
+
+  return ret + ']}';
+}
+
 function hashMapFromPlain(
   plainHashMap: any,
-  recursive = true,
+  customizer: Customizer,
 ): Ice.HashMap<{equals(other: any): boolean; hashCode(): number}, any> {
   const {entries} = plainHashMap;
 
@@ -220,10 +302,7 @@ function hashMapFromPlain(
   >(HashMap.compareEquals);
 
   for (const {key, value} of entries) {
-    ret.set(
-      recursive ? iceFromPlain(key) : key,
-      recursive ? iceFromPlain(value) : value,
-    );
+    ret.set(customizer(key), customizer(value));
   }
 
   return ret;
@@ -232,37 +311,46 @@ function hashMapFromPlain(
 const SET_TYPE = 'Set';
 export {SET_TYPE};
 
-function setToPlain(set: Set<any>, recursive = true): any {
-  const values = [...set];
+function setToPlain(set: Set<any>, customizer: Customizer): any {
+  const values: any[] = [];
+
+  for (const item of set) {
+    values.push(customizer(item));
+  }
 
   return {
     [ICE_TYPE_KEY]: SET_TYPE,
-    value: recursive ? values.map(iceToPlainRecursive) : values,
+    value: values,
   };
 }
 
-function setFromPlain(plainSet: any, recursive = true): Set<any> {
-  const items = plainSet.value as any[];
+function setToJson(set: Set<any>, stringifier: Stringifier): string {
+  let ret = '{"@ice-type":"Set","value":[';
+  let comma = false;
 
-  return new Set(recursive ? items.map(iceFromPlainRecursive) : items);
-}
-
-function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
-  constructor: {new (): T},
-  plainObject: any,
-  recursive = true,
-): T {
-  const ret = new constructor();
-
-  for (const key of Object.keys(plainObject) as Array<keyof T | '@ice-type'>) {
-    if (key === ICE_TYPE_KEY) {
+  for (const value of set) {
+    const valueJson = stringifier(value);
+    if (valueJson === undefined) {
       continue;
     }
-
-    ret[key] = recursive ? iceFromPlain(plainObject[key]) : plainObject[key];
+    if (comma) {
+      ret += ',';
+    }
+    ret += valueJson;
+    comma = true;
   }
 
-  return ret;
+  return ret + ']}';
+}
+
+function setFromPlain(plainSet: any, customizer: Customizer): Set<any> {
+  const res = new Set();
+
+  for (const item of plainSet.value) {
+    res.add(customizer(item));
+  }
+
+  return res;
 }
 
 const internalFields = new Set([
@@ -271,7 +359,7 @@ const internalFields = new Set([
 
 function objectToPlain(
   value: Ice.Value | Ice.Exception | Ice.Struct,
-  recursive = true,
+  customizer: Customizer,
 ): any {
   const ret: any = {
     [ICE_TYPE_KEY]: getType(value),
@@ -282,9 +370,71 @@ function objectToPlain(
       continue;
     }
 
-    ret[key] = recursive
-      ? iceToPlain((value as any)[key])
-      : (value as any)[key];
+    ret[key] = customizer((value as any)[key]);
+  }
+
+  return ret;
+}
+
+function objectToJson(
+  value: Ice.Value | Ice.Exception | Ice.Struct,
+  stringifier: Stringifier,
+) {
+  let objectStringifier = objectStringifiers.get(value.constructor);
+
+  if (objectStringifier == null) {
+    objectStringifier = createObjectStringifier(value);
+    objectStringifiers.set(value.constructor, objectStringifier);
+  }
+
+  return objectStringifier(value, stringifier);
+}
+
+type ObjectStringifier = (
+  value: Ice.Value | Ice.Exception | Ice.Struct,
+  stringifier: (value: any) => string | undefined,
+) => string;
+
+const objectStringifiers = new Map<
+  Function, // constructor
+  ObjectStringifier
+>();
+
+function createObjectStringifier(
+  value: Ice.Value | Ice.Exception | Ice.Struct,
+): ObjectStringifier {
+  let body =
+    `'use strict';\n` +
+    `let v; let ret = '{"@ice-type":"${getType(value)}"';\n`;
+
+  for (const key of Object.keys(value)) {
+    if (internalFields.has(key)) {
+      continue;
+    }
+
+    body +=
+      `v = stringifier(value.${key}); ` +
+      `if (v !== undefined) ret += ',"${key}":' + v;\n`;
+  }
+
+  body += `return ret + '}'`;
+
+  return Function('value', 'stringifier', body) as any;
+}
+
+function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
+  constructor: {new (): T},
+  plainObject: any,
+  customizer: Customizer,
+): T {
+  const ret = new constructor();
+
+  for (const key of Object.keys(plainObject) as Array<keyof T | '@ice-type'>) {
+    if (key === ICE_TYPE_KEY) {
+      continue;
+    }
+
+    ret[key] = customizer(plainObject[key]);
   }
 
   return ret;
@@ -303,9 +453,78 @@ function mapValues(
   return ret;
 }
 
-const iceToPlainRecursive = (value: any) => iceToPlain(value, true);
+// copied from pino
+//
+// magically escape strings for json
+// relying on their charCodeAt
+// everything below 32 needs JSON.stringify()
+// 34 and 92 happens all the time, so we
+// have a fast case for them
+function stringToJson(str: string) {
+  var result = '';
+  var last = 0;
+  var found = false;
+  var point = 255;
+  const l = str.length;
+  if (l > 100) {
+    return JSON.stringify(str);
+  }
+  for (var i = 0; i < l && point >= 32; i++) {
+    point = str.charCodeAt(i);
+    if (point === 34 || point === 92) {
+      result += str.slice(last, i) + '\\';
+      last = i;
+      found = true;
+    }
+  }
+  if (!found) {
+    result = str;
+  } else {
+    result += str.slice(last);
+  }
+  return point < 32 ? JSON.stringify(str) : '"' + result + '"';
+}
 
-export function iceToPlain(iceValue: any, recursive = true): any {
+function arrayToJson(array: Array<any>, stringifier: Stringifier): string {
+  let ret = '[';
+  let comma = false;
+  for (const item of array) {
+    const itemJson = stringifier(item);
+    if (comma) {
+      ret += ',';
+    }
+    ret += itemJson === undefined ? 'null' : itemJson;
+    comma = true;
+  }
+  return ret + ']';
+}
+
+function plainObjectToJson(
+  obj: {[key: string]: any},
+  stringifier: Stringifier,
+): string {
+  let ret = '{';
+  let comma = false;
+  for (const key of Object.keys(obj)) {
+    const valueJson = stringifier((obj as any)[key]);
+    if (valueJson === undefined) {
+      continue;
+    }
+    if (comma) {
+      ret += ',';
+    }
+    ret += stringToJson(key) + ':' + valueJson;
+    comma = true;
+  }
+  return ret + '}';
+}
+
+export type Customizer = (value: any) => any;
+
+export function iceToPlain(
+  iceValue: any,
+  customizer: Customizer = iceToPlain,
+): any {
   if (iceValue === null || typeof iceValue !== 'object') {
     return iceValue;
   }
@@ -319,19 +538,23 @@ export function iceToPlain(iceValue: any, recursive = true): any {
   }
 
   if (Array.isArray(iceValue)) {
-    return recursive ? iceValue.map(iceToPlainRecursive) : iceValue;
+    const res: any[] = [];
+    for (const item of iceValue) {
+      res.push(customizer(item));
+    }
+    return res;
   }
 
   if (iceValue instanceof Map) {
-    return mapToPlain(iceValue, recursive);
+    return mapToPlain(iceValue, customizer);
   }
 
   if (iceValue instanceof HashMap) {
-    return hashMapToPlain(iceValue, recursive);
+    return hashMapToPlain(iceValue, customizer);
   }
 
   if (iceValue instanceof Set) {
-    return setToPlain(iceValue, recursive);
+    return setToPlain(iceValue, customizer);
   }
 
   if (
@@ -339,33 +562,99 @@ export function iceToPlain(iceValue: any, recursive = true): any {
     iceValue instanceof Exception ||
     isStructConstructor(iceValue.constructor)
   ) {
-    return objectToPlain(iceValue, recursive);
+    return objectToPlain(iceValue, customizer);
   }
 
   if (iceValue instanceof ObjectPrx) {
     return proxyToPlain(iceValue);
   }
 
-  return recursive ? mapValues(iceValue, iceToPlainRecursive) : {...iceValue};
+  return mapValues(iceValue, customizer);
 }
 
-const iceFromPlainRecursive = (value: any) => iceFromPlain(value, true);
+export type Stringifier = (value: any) => string | undefined;
 
-export function iceFromPlain(plainValue: any, recursive = true): any {
+export function iceToJson(
+  value: any,
+  stringifier: Stringifier = iceToJson,
+): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  switch (typeof value) {
+    case 'number':
+    case 'boolean':
+      return '' + value;
+    case 'string':
+      return stringToJson(value as string);
+    case 'object':
+      if (value === null) {
+        return 'null';
+      }
+
+      if (value instanceof Long) {
+        return longToJson(value);
+      }
+
+      if (value instanceof EnumBase) {
+        return enumToJson(value);
+      }
+
+      if (
+        value instanceof Value ||
+        value instanceof Exception ||
+        isStructConstructor(value.constructor)
+      ) {
+        return objectToJson(value as any, stringifier);
+      }
+
+      if (value instanceof ObjectPrx) {
+        return proxyToJson(value);
+      }
+
+      if (value instanceof Map) {
+        return mapToJson(value, stringifier);
+      }
+
+      if (value instanceof HashMap) {
+        return hashMapToJson(value, stringifier);
+      }
+
+      if (value instanceof Set) {
+        return setToJson(value, stringifier);
+      }
+
+      if (Array.isArray(value)) {
+        return arrayToJson(value, stringifier);
+      }
+
+      return plainObjectToJson(value, stringifier);
+  }
+
+  return undefined;
+}
+
+export function iceFromPlain(
+  plainValue: any,
+  customizer: Customizer = iceFromPlain,
+): any {
   if (plainValue === null || typeof plainValue !== 'object') {
     return plainValue;
   }
 
   if (Array.isArray(plainValue)) {
-    return recursive ? plainValue.map(iceFromPlainRecursive) : plainValue;
+    const res: any[] = [];
+    for (const item of plainValue) {
+      res.push(customizer(item));
+    }
+    return res;
   }
 
   const iceType: string | undefined = plainValue[ICE_TYPE_KEY];
 
   if (iceType == null) {
-    return recursive
-      ? mapValues(plainValue, iceFromPlainRecursive)
-      : plainValue;
+    return mapValues(plainValue, customizer);
   }
 
   if (iceType === LONG_TYPE) {
@@ -373,15 +662,15 @@ export function iceFromPlain(plainValue: any, recursive = true): any {
   }
 
   if (iceType === MAP_TYPE) {
-    return mapFromPlain(plainValue, recursive);
+    return mapFromPlain(plainValue, customizer);
   }
 
   if (iceType === HASH_MAP_TYPE) {
-    return hashMapFromPlain(plainValue, recursive);
+    return hashMapFromPlain(plainValue, customizer);
   }
 
   if (iceType === SET_TYPE) {
-    return setFromPlain(plainValue, recursive);
+    return setFromPlain(plainValue, customizer);
   }
 
   if (iceType.endsWith('Prx')) {
@@ -394,5 +683,5 @@ export function iceFromPlain(plainValue: any, recursive = true): any {
     return enumFromPlain(constructor, plainValue);
   }
 
-  return objectFromPlain(constructor, plainValue, recursive);
+  return objectFromPlain(constructor, plainValue, customizer);
 }

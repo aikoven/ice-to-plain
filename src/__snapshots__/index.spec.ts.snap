@@ -20,9 +20,10 @@ Object {
   "entries": Array [
     Object {
       "key": Object {
-        "enumField": type {
-          "_name": "Second",
-          "_value": 1,
+        "@ice-type": "Test.KeyStruct",
+        "enumField": Object {
+          "@ice-type": "Test.TheEnum",
+          "value": "Second",
         },
         "intField": 24,
         "stringField": "bar",
@@ -31,9 +32,10 @@ Object {
     },
     Object {
       "key": Object {
-        "enumField": type {
-          "_name": "First",
-          "_value": 0,
+        "@ice-type": "Test.KeyStruct",
+        "enumField": Object {
+          "@ice-type": "Test.TheEnum",
+          "value": "First",
         },
         "intField": 42,
         "stringField": "foo",
@@ -64,27 +66,31 @@ Object {
   "@ice-type": "Map",
   "entries": Object {
     "false": Object {
+      "@ice-type": "Test.TheStruct",
       "classField": Object {
-        "longField": Long {
-          "high": 0,
-          "low": 321,
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 321,
         },
       },
-      "longField": Long {
-        "high": 0,
-        "low": 123,
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 123,
       },
     },
     "true": Object {
+      "@ice-type": "Test.TheStruct",
       "classField": Object {
-        "longField": Long {
-          "high": 0,
-          "low": 24,
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 24,
         },
       },
-      "longField": Long {
-        "high": 0,
-        "low": 42,
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 42,
       },
     },
   },
@@ -96,27 +102,31 @@ Object {
   "@ice-type": "Map",
   "entries": Object {
     "-1": Object {
+      "@ice-type": "Test.TheStruct",
       "classField": Object {
-        "longField": Long {
-          "high": 0,
-          "low": 321,
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 321,
         },
       },
-      "longField": Long {
-        "high": 0,
-        "low": 123,
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 123,
       },
     },
     "1": Object {
+      "@ice-type": "Test.TheStruct",
       "classField": Object {
-        "longField": Long {
-          "high": 0,
-          "low": 24,
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 24,
         },
       },
-      "longField": Long {
-        "high": 0,
-        "low": 42,
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 42,
       },
     },
   },
@@ -128,27 +138,31 @@ Object {
   "@ice-type": "Map",
   "entries": Object {
     "\\"kek\\"": Object {
+      "@ice-type": "Test.TheStruct",
       "classField": Object {
-        "longField": Long {
-          "high": 0,
-          "low": 321,
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 321,
         },
       },
-      "longField": Long {
-        "high": 0,
-        "low": 123,
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 123,
       },
     },
     "\\"lol\\"": Object {
+      "@ice-type": "Test.TheStruct",
       "classField": Object {
-        "longField": Long {
-          "high": 0,
-          "low": 24,
+        "@ice-type": "Test.SmallClass",
+        "longField": Object {
+          "@ice-type": "Ice.Long",
+          "value": 24,
         },
       },
-      "longField": Long {
-        "high": 0,
-        "low": 42,
+      "longField": Object {
+        "@ice-type": "Ice.Long",
+        "value": 42,
       },
     },
   },
@@ -177,14 +191,15 @@ exports[`Struct 1`] = `
 Object {
   "@ice-type": "Test.TheStruct",
   "classField": Object {
-    "longField": Long {
-      "high": 0,
-      "low": 24,
+    "@ice-type": "Test.SmallClass",
+    "longField": Object {
+      "@ice-type": "Ice.Long",
+      "value": 24,
     },
   },
-  "longField": Long {
-    "high": 0,
-    "low": 42,
+  "longField": Object {
+    "@ice-type": "Ice.Long",
+    "value": 42,
   },
 }
 `;
@@ -192,9 +207,9 @@ Object {
 exports[`Value 1`] = `
 Object {
   "@ice-type": "Test.SmallClass",
-  "longField": Long {
-    "high": 0,
-    "low": 42,
+  "longField": Object {
+    "@ice-type": "Ice.Long",
+    "value": 42,
   },
 }
 `;
@@ -268,6 +283,7 @@ Object {
       "high": 20000000,
       "low": 0,
     },
+    "optionalField": undefined,
     "primitiveKeyDictField": Object {
       "@ice-type": "Map",
       "entries": Object {

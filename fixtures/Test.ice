@@ -45,6 +45,8 @@ module Test {
     StructSeq structSeqField;
 
     StringKeyDict primitiveKeyDictField;
+
+    optional(1) int optionalField;
   };
 
   module Keywords {

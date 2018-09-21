@@ -89,7 +89,8 @@ declare module "./Test.ns" {
         primitiveSeqField?: PrimitiveSeq,
         smallClassSeqField?: SmallClassSeq,
         structSeqField?: StructSeq,
-        primitiveKeyDictField?: StringKeyDict
+        primitiveKeyDictField?: StringKeyDict,
+        optionalField?: number | undefined
       );
 
       structField: TheStruct;
@@ -98,6 +99,7 @@ declare module "./Test.ns" {
       smallClassSeqField: SmallClassSeq;
       structSeqField: StructSeq;
       primitiveKeyDictField: StringKeyDict;
+      optionalField?: number;
     }
 
     namespace Keywords {

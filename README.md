@@ -1,7 +1,8 @@
 # Ice to Plain [![npm version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
 Convert Ice stuff to and from plain JS objects.
-Supports `long`, `enum`, `struct`, `dictionary`, `exception` and `class`.
+Supports `long`, `enum`, `struct`, `dictionary`, `exception` and `class`,
+as well as JS objects, arrays, Maps and Sets.
 
 ## Installation
 
@@ -10,15 +11,15 @@ Supports `long`, `enum`, `struct`, `dictionary`, `exception` and `class`.
 ## Usage
 
 ```ts
-import {iceToPlain, iceFromPlain} from 'ice-to-plain';
+import {iceToPlain, iceToJson, iceFromPlain} from 'ice-to-plain';
 import {isEqual} from 'lodash';
 
 const plain = iceToPlain(someIceValue);
-isEqual(someIceValue, iceFromPlain(plain));  // true
+isEqual(someIceValue, iceFromPlain(plain)); // true
 
-// only convert one level deep
-const shallowPlain = iceToPlain(someIceValue, false);
-isEqual(someIceValue, iceFromPlain(shallowPlain, false));  // true
+// 4-5x faster than JSON.stringify for Ice objects
+// but 4-5x slower on regular JS objects
+const json = iceToJson(someIceValue);
 ```
 
 [npm-image]: https://badge.fury.io/js/ice-to-plain.svg
