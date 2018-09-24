@@ -123,6 +123,8 @@ Slice.defineDictionary(Test, "IntKeyDict", "IntKeyDictHelper", "Ice.IntHelper", 
 
 Slice.defineDictionary(Test, "StructKeyDict", "StructKeyDictHelper", "Test.KeyStruct", "Ice.StringHelper", false, _ice.Ice.HashMap.compareEquals, undefined);
 
+Slice.defineDictionary(Test, "EnumKeyDict", "EnumKeyDictHelper", "Test.TheEnum._helper", "Ice.StringHelper", false, undefined, undefined);
+
 Test.TheError = class extends _ice.Ice.UserException {
     constructor(stringField = "", _cause = "") {
         super(_cause);

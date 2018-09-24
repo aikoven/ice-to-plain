@@ -184,7 +184,9 @@ function proxyToJson(proxy: Ice.ObjectPrx) {
 const MAP_TYPE = 'Map';
 export {MAP_TYPE};
 
-function stringifyMapKey(key: string | number | boolean) {
+function stringifyMapKey(
+  key: string | number | boolean | Ice.EnumBase<string>,
+) {
   switch (typeof key) {
     case 'number':
     case 'boolean':
@@ -192,12 +194,12 @@ function stringifyMapKey(key: string | number | boolean) {
     case 'string':
       return stringToJson(key as string);
     default:
-      return JSON.stringify(key);
+      return iceToJson(key)!;
   }
 }
 
 function mapToPlain(
-  map: Map<string | number | boolean, any>,
+  map: Map<string | number | boolean | Ice.EnumBase<string>, any>,
   customizer: Customizer,
 ): any {
   const entries: {[key: string]: any} = {};
@@ -215,7 +217,7 @@ function mapToPlain(
 }
 
 function mapToJson(
-  map: Map<string | number | boolean, any>,
+  map: Map<string | number | boolean | Ice.EnumBase<string>, any>,
   stringifier: Stringifier,
 ): string {
   let ret = '{"@ice-type":"Map","entries":{';
@@ -245,7 +247,7 @@ function mapFromPlain(
   const ret = new Map<string | number | boolean, any>();
 
   for (const key of Object.keys(entries)) {
-    ret.set(JSON.parse(key), customizer(entries[key]));
+    ret.set(iceFromPlain(JSON.parse(key)), customizer(entries[key]));
   }
 
   return ret;

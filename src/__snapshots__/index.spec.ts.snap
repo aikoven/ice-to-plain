@@ -97,6 +97,15 @@ Object {
 }
 `;
 
+exports[`Map with enum keys 1`] = `
+Object {
+  "@ice-type": "Map",
+  "entries": Object {
+    "{\\"@ice-type\\":\\"Test.TheEnum\\",\\"value\\":\\"First\\"}": "second",
+  },
+}
+`;
+
 exports[`Map with int keys 1`] = `
 Object {
   "@ice-type": "Map",

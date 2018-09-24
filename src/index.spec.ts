@@ -98,6 +98,18 @@ test('Map with int keys', () => {
   expectEqual(iceFromPlain(mapPlain), map);
 });
 
+test('Map with enum keys', () => {
+  // https://github.com/aikoven/slice2ts/issues/5
+  const map: Test.EnumKeyDict = new Map() as any;
+  map.set(Test.TheEnum.First, 'first');
+  map.set(Test.TheEnum.First, 'second');
+
+  const mapPlain = iceToPlain(map);
+  expect(mapPlain).toMatchSnapshot();
+  expect(iceToJson(map)).toEqual(JSON.stringify(mapPlain));
+  expectEqual(iceFromPlain(mapPlain), map);
+});
+
 test('HashMap', () => {
   const hashMap: Test.StructKeyDict = new Ice.HashMap();
 

@@ -75,6 +75,11 @@ declare module "./Test.ns" {
       new (): Ice.HashMap<KeyStruct, string>;
     };
 
+    type EnumKeyDict = Ice.HashMap<TheEnum, string>;
+    const EnumKeyDict: {
+      new (): Ice.HashMap<TheEnum, string>;
+    };
+
     class TheError extends Ice.UserException {
       constructor(stringField?: string);
 

@@ -31,6 +31,7 @@ module Test {
   dictionary<bool, TheStruct> BoolKeyDict;
   dictionary<int, TheStruct> IntKeyDict;
   dictionary<KeyStruct, string> StructKeyDict;
+  dictionary<TheEnum, string> EnumKeyDict;
 
   exception TheError {
     string stringField;
