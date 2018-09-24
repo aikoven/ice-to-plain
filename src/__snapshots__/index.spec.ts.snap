@@ -217,11 +217,11 @@ Object {
 exports[`keywords 1`] = `
 Object {
   "await": Object {
-    "@ice-type": "Test.Keywords._Await",
-    "_import": 1,
+    "@ice-type": "Test.Keywords.Await",
+    "import": 1,
   },
   "break": Object {
-    "@ice-type": "Test.Keywords._Break",
+    "@ice-type": "Test.Keywords.Break",
   },
   "catch": Object {
     "@ice-type": "Map",
@@ -229,7 +229,7 @@ Object {
   },
   "try": Object {
     "@ice-type": "Test.Keywords.E",
-    "value": "_TRY",
+    "value": "TRY",
   },
 }
 `;

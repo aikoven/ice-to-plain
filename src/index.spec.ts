@@ -229,5 +229,6 @@ test('keywords', () => {
 
   const objPlain = iceToPlain(obj);
   expect(objPlain).toMatchSnapshot();
+  expect(iceToJson(obj)).toEqual(JSON.stringify(objPlain));
   expectEqual(iceFromPlain(objPlain), obj);
 });

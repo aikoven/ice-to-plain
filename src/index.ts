@@ -27,19 +27,17 @@ function isEnumConstructor(constructor: Function) {
   );
 }
 
-function cacheConstructors(iceModule?: any, prefix?: string) {
-  if (iceModule == null) {
-    // hack to get an object containing all top-level Slice modules
-    iceModule = (Ice as any)._ModuleRegistry.type({split: () => []});
-  }
+// hack to get an object containing all top-level Slice modules
+const rootIceModule = (Ice as any)._ModuleRegistry.type({split: () => []});
 
-  for (const name of Object.keys(iceModule)) {
-    const value = iceModule[name];
-
-    const typePath = prefix == null ? name : `${prefix}.${name}`;
+function cacheConstructors(iceModule: {[key: string]: any}, prefix?: string) {
+  for (const key of Object.keys(iceModule)) {
+    const value = iceModule[key];
 
     if (value.constructor === Object) {
       // value is a module
+      const name = key[0] === '_' ? key.substr(1) : key;
+      const typePath = prefix == null ? name : `${prefix}.${name}`;
       cacheConstructors(value, typePath);
     } else if (typeof value === 'function') {
       if (
@@ -49,13 +47,15 @@ function cacheConstructors(iceModule?: any, prefix?: string) {
         value.prototype instanceof Exception ||
         value.prototype instanceof ObjectPrx
       ) {
+        const name = key[0] === '_' ? key.substr(1) : key;
+        const typePath = prefix == null ? name : `${prefix}.${name}`;
         typeMap.set(value, typePath);
       }
     }
   }
 }
 
-cacheConstructors();
+cacheConstructors(rootIceModule);
 
 function getType(
   value:
@@ -68,7 +68,9 @@ function getType(
   let type = typeMap.get(value.constructor);
 
   if (type == null) {
-    cacheConstructors();
+    // cache types again to handle case when module containing type was loaded
+    // after `ice-to-plain`
+    cacheConstructors(rootIceModule);
     type = typeMap.get(value.constructor);
   }
 
@@ -80,13 +82,20 @@ function getType(
 }
 
 function getConstructor(type: string): any {
-  const constructor = (Ice as any)._ModuleRegistry.type(type);
+  let result = rootIceModule;
 
-  if (constructor == null) {
+  for (const name of type.split('.')) {
+    result = result[name] || result['_' + name];
+    if (result == null) {
+      break;
+    }
+  }
+
+  if (typeof result !== 'function') {
     throw new Error(`Could not find constructor for type ${type}`);
   }
 
-  return constructor;
+  return result;
 }
 
 const ICE_TYPE_KEY = '@ice-type';
@@ -139,21 +148,25 @@ function longFromPlain(plainLong: any): Ice.Long {
 }
 
 function enumToPlain(enumValue: Ice.EnumBase<string>): any {
+  const {name} = enumValue;
+  const value = name[0] === '_' ? name.substr(1) : name;
   return {
     [ICE_TYPE_KEY]: getType(enumValue),
-    value: enumValue.name,
+    value,
   };
 }
 
 function enumToJson(enumValue: Ice.EnumBase<string>) {
-  return `{"@ice-type":"${getType(enumValue)}","value":"${enumValue.name}"}`;
+  const {name} = enumValue;
+  const value = name[0] === '_' ? name.substr(1) : name;
+  return `{"@ice-type":"${getType(enumValue)}","value":"${value}"}`;
 }
 
 function enumFromPlain(
   constructor: {[name: string]: Ice.EnumBase<string>},
   plainEnum: any,
 ): Ice.EnumBase<string> {
-  return constructor[plainEnum.value];
+  return constructor[plainEnum.value] || constructor['_' + plainEnum.value];
 }
 
 function proxyToPlain(proxy: Ice.ObjectPrx): any {
@@ -357,6 +370,55 @@ const internalFields = new Set([
   '_inToStringAlready', // exceptions
 ]);
 
+const keywords = new Set([
+  'await',
+  'break',
+  'case',
+  'catch',
+  'class',
+  'const',
+  'continue',
+  'debugger',
+  'default',
+  'delete',
+  'do',
+  'else',
+  'enum',
+  'export',
+  'extends',
+  'false',
+  'finally',
+  'for',
+  'function',
+  'if',
+  'implements',
+  'import',
+  'in',
+  'instanceof',
+  'interface',
+  'let',
+  'new',
+  'null',
+  'package',
+  'private',
+  'protected',
+  'public',
+  'return',
+  'static',
+  'super',
+  'switch',
+  'this',
+  'throw',
+  'true',
+  'try',
+  'typeof',
+  'var',
+  'void',
+  'while',
+  'with',
+  'yield',
+]);
+
 function objectToPlain(
   value: Ice.Value | Ice.Exception | Ice.Struct,
   customizer: Customizer,
@@ -370,7 +432,9 @@ function objectToPlain(
       continue;
     }
 
-    ret[key] = customizer((value as any)[key]);
+    const name = key[0] === '_' ? key.substr(1) : key;
+
+    ret[name] = customizer((value as any)[key]);
   }
 
   return ret;
@@ -412,9 +476,11 @@ function createObjectStringifier(
       continue;
     }
 
+    const name = key[0] === '_' ? key.substr(1) : key;
+
     body +=
       `v = stringifier(value.${key}); ` +
-      `if (v !== undefined) ret += ',"${key}":' + v;\n`;
+      `if (v !== undefined) ret += ',"${name}":' + v;\n`;
   }
 
   body += `return ret + '}'`;
@@ -427,14 +493,16 @@ function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
   plainObject: any,
   customizer: Customizer,
 ): T {
-  const ret = new constructor();
+  const ret: any = new constructor();
 
-  for (const key of Object.keys(plainObject) as Array<keyof T | '@ice-type'>) {
+  for (const key of Object.keys(plainObject)) {
     if (key === ICE_TYPE_KEY) {
       continue;
     }
 
-    ret[key] = customizer(plainObject[key]);
+    const name = keywords.has(key.toLowerCase()) ? '_' + key : key;
+
+    ret[name] = customizer(plainObject[key]);
   }
 
   return ret;
