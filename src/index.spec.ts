@@ -222,8 +222,8 @@ test('plain', () => {
 test('keywords', () => {
   const obj = {
     await: new Test.Keywords._Await(1),
-    break: new Test.Keywords._Break(),
-    try: Test.Keywords.E._TRY,
+    break: new Test.Keywords._Break('yield'),
+    try: Test.Keywords._Continue._TRY,
     catch: new Test.Keywords._Catch(),
   };
 

@@ -113,12 +113,18 @@ declare module "./Test.ns" {
         hashCode(): number;
       }
 
-      class _Break extends Ice.Value {}
+      class _Break extends Ice.Value {
+        constructor(_yield?: string);
 
-      type EName = "_TRY";
+        _yield: string;
+      }
 
-      class E<Name extends EName = EName> extends Ice.EnumBase<Name> {
-        static _TRY: E<"_TRY">;
+      type _ContinueName = "_TRY";
+
+      class _Continue<
+        Name extends _ContinueName = _ContinueName
+      > extends Ice.EnumBase<Name> {
+        static _TRY: _Continue<"_TRY">;
       }
 
       type _Catch = Map<string, number>;

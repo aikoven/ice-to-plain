@@ -215,7 +215,20 @@ Slice.defineStruct(Test.Keywords._Await, true, false);
 
 const iceC_Test_Keywords__Break_ids = ["::Ice::Object", "::Test::Keywords::Break"];
 
-Test.Keywords._Break = class extends _ice.Ice.Value {};
+Test.Keywords._Break = class extends _ice.Ice.Value {
+    constructor(_yield = "") {
+        super();
+        this._yield = _yield;
+    }
+
+    _iceWriteMemberImpl(ostr) {
+        ostr.writeString(this._yield);
+    }
+
+    _iceReadMemberImpl(istr) {
+        this._yield = istr.readString();
+    }
+};
 
 Slice.defineValue(Test.Keywords._Break, iceC_Test_Keywords__Break_ids[1], false);
 
@@ -223,7 +236,7 @@ Test.Keywords.BreakDisp = class extends _ice.Ice.Object {};
 
 Slice.defineOperations(Test.Keywords.BreakDisp, undefined, iceC_Test_Keywords__Break_ids, 1);
 
-Test.Keywords.E = Slice.defineEnum([['_TRY', 0]]);
+Test.Keywords._Continue = Slice.defineEnum([['_TRY', 0]]);
 
 Slice.defineDictionary(Test.Keywords, "_Catch", "_CatchHelper", "Ice.StringHelper", "Ice.IntHelper", false, undefined, undefined);
 exports.Test = Test;

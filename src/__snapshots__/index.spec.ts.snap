@@ -222,13 +222,14 @@ Object {
   },
   "break": Object {
     "@ice-type": "Test.Keywords.Break",
+    "yield": "yield",
   },
   "catch": Object {
     "@ice-type": "Map",
     "entries": Object {},
   },
   "try": Object {
-    "@ice-type": "Test.Keywords.E",
+    "@ice-type": "Test.Keywords.Continue",
     "value": "TRY",
   },
 }

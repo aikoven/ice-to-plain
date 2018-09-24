@@ -54,9 +54,11 @@ module Test {
       int import;
     };
 
-    class Break {};
+    class Break {
+      string yield;
+    };
 
-    enum E {
+    enum Continue {
       TRY
     };
 
