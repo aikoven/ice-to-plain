@@ -98,8 +98,8 @@ function getConstructor(type: string): any {
   return result;
 }
 
-const ICE_TYPE_KEY = '@ice-type';
-export {ICE_TYPE_KEY};
+const TYPE_KEY = '@@type';
+export {TYPE_KEY};
 
 const LONG_TYPE = 'Ice.Long';
 export {LONG_TYPE};
@@ -113,12 +113,12 @@ function longToPlain(long: Ice.Long) {
     value !== Number.NEGATIVE_INFINITY
   ) {
     return {
-      [ICE_TYPE_KEY]: LONG_TYPE,
+      [TYPE_KEY]: LONG_TYPE,
       value,
     };
   } else {
     return {
-      [ICE_TYPE_KEY]: LONG_TYPE,
+      [TYPE_KEY]: LONG_TYPE,
       high: long.high,
       low: long.low,
     };
@@ -133,9 +133,9 @@ function longToJson(long: Ice.Long) {
     value !== Number.POSITIVE_INFINITY &&
     value !== Number.NEGATIVE_INFINITY
   ) {
-    return `{"@ice-type":"Ice.Long","value":${value}}`;
+    return `{"@@type":"Ice.Long","value":${value}}`;
   } else {
-    return `{"@ice-type":"Ice.Long","high":${long.high},"low":${long.low}}`;
+    return `{"@@type":"Ice.Long","high":${long.high},"low":${long.low}}`;
   }
 }
 
@@ -151,7 +151,7 @@ function enumToPlain(enumValue: Ice.EnumBase<string>): any {
   const {name} = enumValue;
   const value = name[0] === '_' ? name.substr(1) : name;
   return {
-    [ICE_TYPE_KEY]: getType(enumValue),
+    [TYPE_KEY]: getType(enumValue),
     value,
   };
 }
@@ -159,7 +159,7 @@ function enumToPlain(enumValue: Ice.EnumBase<string>): any {
 function enumToJson(enumValue: Ice.EnumBase<string>) {
   const {name} = enumValue;
   const value = name[0] === '_' ? name.substr(1) : name;
-  return `{"@ice-type":"${getType(enumValue)}","value":"${value}"}`;
+  return `{"@@type":"${getType(enumValue)}","value":"${value}"}`;
 }
 
 function enumFromPlain(
@@ -171,14 +171,14 @@ function enumFromPlain(
 
 function proxyToPlain(proxy: Ice.ObjectPrx): any {
   return {
-    [ICE_TYPE_KEY]: getType(proxy),
+    [TYPE_KEY]: getType(proxy),
     value: proxy.toString(),
   };
 }
 
 function proxyToJson(proxy: Ice.ObjectPrx) {
   const valueJson = stringToJson(proxy.toString());
-  return `{"@ice-type":"${getType(proxy)}","value":${valueJson}}`;
+  return `{"@@type":"${getType(proxy)}","value":${valueJson}}`;
 }
 
 const MAP_TYPE = 'Map';
@@ -205,7 +205,7 @@ function mapToPlain(
   const entries: {[key: string]: any} = {};
 
   const ret = {
-    [ICE_TYPE_KEY]: MAP_TYPE,
+    [TYPE_KEY]: MAP_TYPE,
     entries,
   };
 
@@ -220,7 +220,7 @@ function mapToJson(
   map: Map<string | number | boolean | Ice.EnumBase<string>, any>,
   stringifier: Stringifier,
 ): string {
-  let ret = '{"@ice-type":"Map","entries":{';
+  let ret = '{"@@type":"Map","entries":{';
   let comma = false;
 
   for (const [key, value] of map.entries()) {
@@ -263,7 +263,7 @@ function hashMapToPlain(
   const entries: Array<{key: any; value: any}> = [];
 
   const ret = {
-    [ICE_TYPE_KEY]: HASH_MAP_TYPE,
+    [TYPE_KEY]: HASH_MAP_TYPE,
     entries,
   };
 
@@ -281,7 +281,7 @@ function hashMapToJson(
   hashMap: Ice.HashMap<Ice.HashMapKey, any>,
   stringifier: Stringifier,
 ): string {
-  let ret = '{"@ice-type":"Ice.HashMap","entries":[';
+  let ret = '{"@@type":"Ice.HashMap","entries":[';
   let comma = false;
 
   for (const [key, value] of hashMap.entries()) {
@@ -334,13 +334,13 @@ function setToPlain(set: Set<any>, customizer: Customizer): any {
   }
 
   return {
-    [ICE_TYPE_KEY]: SET_TYPE,
+    [TYPE_KEY]: SET_TYPE,
     value: values,
   };
 }
 
 function setToJson(set: Set<any>, stringifier: Stringifier): string {
-  let ret = '{"@ice-type":"Set","value":[';
+  let ret = '{"@@type":"Set","value":[';
   let comma = false;
 
   for (const value of set) {
@@ -426,7 +426,7 @@ function objectToPlain(
   customizer: Customizer,
 ): any {
   const ret: any = {
-    [ICE_TYPE_KEY]: getType(value),
+    [TYPE_KEY]: getType(value),
   };
 
   for (const key of Object.keys(value)) {
@@ -470,8 +470,7 @@ function createObjectStringifier(
   value: Ice.Value | Ice.Exception | Ice.Struct,
 ): ObjectStringifier {
   let body =
-    `'use strict';\n` +
-    `let v; let ret = '{"@ice-type":"${getType(value)}"';\n`;
+    `'use strict';\n` + `let v; let ret = '{"@@type":"${getType(value)}"';\n`;
 
   for (const key of Object.keys(value)) {
     if (internalFields.has(key)) {
@@ -498,7 +497,7 @@ function objectFromPlain<T extends Ice.Struct | Ice.Object | Ice.Exception>(
   const ret: any = new constructor();
 
   for (const key of Object.keys(plainObject)) {
-    if (key === ICE_TYPE_KEY) {
+    if (key === TYPE_KEY) {
       continue;
     }
 
@@ -721,7 +720,7 @@ export function iceFromPlain(
     return res;
   }
 
-  const iceType: string | undefined = plainValue[ICE_TYPE_KEY];
+  const iceType: string | undefined = plainValue[TYPE_KEY];
 
   if (iceType == null) {
     return mapValues(plainValue, customizer);

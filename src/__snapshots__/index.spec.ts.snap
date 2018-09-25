@@ -2,27 +2,27 @@
 
 exports[`Enum 1`] = `
 Object {
-  "@ice-type": "Test.TheEnum",
+  "@@type": "Test.TheEnum",
   "value": "First",
 }
 `;
 
 exports[`Exception 1`] = `
 Object {
-  "@ice-type": "Test.TheError",
+  "@@type": "Test.TheError",
   "stringField": "kek",
 }
 `;
 
 exports[`HashMap 1`] = `
 Object {
-  "@ice-type": "Ice.HashMap",
+  "@@type": "Ice.HashMap",
   "entries": Array [
     Object {
       "key": Object {
-        "@ice-type": "Test.KeyStruct",
+        "@@type": "Test.KeyStruct",
         "enumField": Object {
-          "@ice-type": "Test.TheEnum",
+          "@@type": "Test.TheEnum",
           "value": "Second",
         },
         "intField": 24,
@@ -32,9 +32,9 @@ Object {
     },
     Object {
       "key": Object {
-        "@ice-type": "Test.KeyStruct",
+        "@@type": "Test.KeyStruct",
         "enumField": Object {
-          "@ice-type": "Test.TheEnum",
+          "@@type": "Test.TheEnum",
           "value": "First",
         },
         "intField": 42,
@@ -48,14 +48,14 @@ Object {
 
 exports[`Long 1`] = `
 Object {
-  "@ice-type": "Ice.Long",
+  "@@type": "Ice.Long",
   "value": 1099511627776,
 }
 `;
 
 exports[`Long 2`] = `
 Object {
-  "@ice-type": "Ice.Long",
+  "@@type": "Ice.Long",
   "high": 20000000,
   "low": 0,
 }
@@ -63,33 +63,33 @@ Object {
 
 exports[`Map with bool keys 1`] = `
 Object {
-  "@ice-type": "Map",
+  "@@type": "Map",
   "entries": Object {
     "false": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 321,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 123,
       },
     },
     "true": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 24,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 42,
       },
     },
@@ -99,42 +99,42 @@ Object {
 
 exports[`Map with enum keys 1`] = `
 Object {
-  "@ice-type": "Map",
+  "@@type": "Map",
   "entries": Object {
-    "{\\"@ice-type\\":\\"Test.TheEnum\\",\\"value\\":\\"First\\"}": "second",
+    "{\\"@@type\\":\\"Test.TheEnum\\",\\"value\\":\\"First\\"}": "second",
   },
 }
 `;
 
 exports[`Map with int keys 1`] = `
 Object {
-  "@ice-type": "Map",
+  "@@type": "Map",
   "entries": Object {
     "-1": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 321,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 123,
       },
     },
     "1": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 24,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 42,
       },
     },
@@ -144,33 +144,33 @@ Object {
 
 exports[`Map with string keys 1`] = `
 Object {
-  "@ice-type": "Map",
+  "@@type": "Map",
   "entries": Object {
     "\\"kek\\"": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 321,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 123,
       },
     },
     "\\"lol\\"": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 24,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 42,
       },
     },
@@ -180,14 +180,14 @@ Object {
 
 exports[`Proxy 1`] = `
 Object {
-  "@ice-type": "Ice.LocatorPrx",
+  "@@type": "Ice.LocatorPrx",
   "value": "Category/Name -t -e 1.1:tcp -h blabla -p 1234 -t 60000",
 }
 `;
 
 exports[`Set 1`] = `
 Object {
-  "@ice-type": "Set",
+  "@@type": "Set",
   "value": Array [
     1,
     2,
@@ -198,16 +198,16 @@ Object {
 
 exports[`Struct 1`] = `
 Object {
-  "@ice-type": "Test.TheStruct",
+  "@@type": "Test.TheStruct",
   "classField": Object {
-    "@ice-type": "Test.SmallClass",
+    "@@type": "Test.SmallClass",
     "longField": Object {
-      "@ice-type": "Ice.Long",
+      "@@type": "Ice.Long",
       "value": 24,
     },
   },
   "longField": Object {
-    "@ice-type": "Ice.Long",
+    "@@type": "Ice.Long",
     "value": 42,
   },
 }
@@ -215,9 +215,9 @@ Object {
 
 exports[`Value 1`] = `
 Object {
-  "@ice-type": "Test.SmallClass",
+  "@@type": "Test.SmallClass",
   "longField": Object {
-    "@ice-type": "Ice.Long",
+    "@@type": "Ice.Long",
     "value": 42,
   },
 }
@@ -226,19 +226,19 @@ Object {
 exports[`keywords 1`] = `
 Object {
   "await": Object {
-    "@ice-type": "Test.Keywords.Await",
+    "@@type": "Test.Keywords.Await",
     "import": 1,
   },
   "break": Object {
-    "@ice-type": "Test.Keywords.Break",
+    "@@type": "Test.Keywords.Break",
     "yield": "yield",
   },
   "catch": Object {
-    "@ice-type": "Map",
+    "@@type": "Map",
     "entries": Object {},
   },
   "try": Object {
-    "@ice-type": "Test.Keywords.Continue",
+    "@@type": "Test.Keywords.Continue",
     "value": "TRY",
   },
 }
@@ -248,13 +248,13 @@ exports[`recursive 1`] = `
 Object {
   "array": Array [
     Object {
-      "@ice-type": "Test.TheEnum",
+      "@@type": "Test.TheEnum",
       "value": "First",
     },
     Object {
-      "@ice-type": "Test.SmallClass",
+      "@@type": "Test.SmallClass",
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 42,
       },
     },
@@ -263,45 +263,45 @@ Object {
   "int": 42,
   "nested": Object {
     "error": Object {
-      "@ice-type": "Test.TheError",
+      "@@type": "Test.TheError",
       "stringField": "kek",
     },
     "struct": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 24,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 42,
       },
     },
   },
   "null": null,
   "rich": Object {
-    "@ice-type": "Test.RichClass",
+    "@@type": "Test.RichClass",
     "enumField": Object {
-      "@ice-type": "Test.TheEnum",
+      "@@type": "Test.TheEnum",
       "value": "Second",
     },
     "longField": Object {
-      "@ice-type": "Ice.Long",
+      "@@type": "Ice.Long",
       "high": 20000000,
       "low": 0,
     },
     "optionalField": undefined,
     "primitiveKeyDictField": Object {
-      "@ice-type": "Map",
+      "@@type": "Map",
       "entries": Object {
         "\\"foo\\"": Object {
-          "@ice-type": "Test.TheStruct",
+          "@@type": "Test.TheStruct",
           "classField": null,
           "longField": Object {
-            "@ice-type": "Ice.Long",
+            "@@type": "Ice.Long",
             "value": 0,
           },
         },
@@ -313,46 +313,46 @@ Object {
     ],
     "smallClassSeqField": Array [
       Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 42,
         },
       },
       Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 24,
         },
       },
     ],
     "structField": Object {
-      "@ice-type": "Test.TheStruct",
+      "@@type": "Test.TheStruct",
       "classField": Object {
-        "@ice-type": "Test.SmallClass",
+        "@@type": "Test.SmallClass",
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 24,
         },
       },
       "longField": Object {
-        "@ice-type": "Ice.Long",
+        "@@type": "Ice.Long",
         "value": 42,
       },
     },
     "structSeqField": Array [
       Object {
-        "@ice-type": "Test.TheStruct",
+        "@@type": "Test.TheStruct",
         "classField": Object {
-          "@ice-type": "Test.SmallClass",
+          "@@type": "Test.SmallClass",
           "longField": Object {
-            "@ice-type": "Ice.Long",
+            "@@type": "Ice.Long",
             "value": 24,
           },
         },
         "longField": Object {
-          "@ice-type": "Ice.Long",
+          "@@type": "Ice.Long",
           "value": 42,
         },
       },
