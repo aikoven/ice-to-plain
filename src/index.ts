@@ -186,6 +186,7 @@ export {MAP_TYPE};
 
 function stringifyMapKey(
   key: string | number | boolean | Ice.EnumBase<string>,
+  stringifier: Stringifier,
 ) {
   switch (typeof key) {
     case 'number':
@@ -194,7 +195,7 @@ function stringifyMapKey(
     case 'string':
       return stringToJson(key as string);
     default:
-      return iceToJson(key)!;
+      return stringifier(key)!;
   }
 }
 
@@ -209,8 +210,10 @@ function mapToPlain(
     entries,
   };
 
+  const stringifier: Stringifier = value => JSON.stringify(customizer(value));
+
   for (const [key, value] of map.entries()) {
-    entries[stringifyMapKey(key)] = customizer(value);
+    entries[stringifyMapKey(key, stringifier)] = customizer(value);
   }
 
   return ret;
@@ -231,7 +234,7 @@ function mapToJson(
     if (comma) {
       ret += ',';
     }
-    ret += stringToJson(stringifyMapKey(key)) + ':' + valueJson;
+    ret += stringToJson(stringifyMapKey(key, stringifier)) + ':' + valueJson;
     comma = true;
   }
 
