@@ -250,7 +250,7 @@ function mapFromPlain(
   const ret = new Map<string | number | boolean, any>();
 
   for (const key of Object.keys(entries)) {
-    ret.set(iceFromPlain(JSON.parse(key)), customizer(entries[key]));
+    ret.set(customizer(JSON.parse(key)), customizer(entries[key]));
   }
 
   return ret;
