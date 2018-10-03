@@ -1,6 +1,6 @@
 {
   "name": "ice-to-plain",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Convert Ice stuff to and from plain JS objects",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
