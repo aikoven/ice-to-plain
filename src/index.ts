@@ -104,7 +104,18 @@ export {TYPE_KEY};
 const LONG_TYPE = 'Ice.Long';
 export {LONG_TYPE};
 
-function longToPlain(long: Ice.Long) {
+export type PlainLong =
+  | {
+      [TYPE_KEY]: typeof LONG_TYPE;
+      value: number;
+    }
+  | {
+      [TYPE_KEY]: typeof LONG_TYPE;
+      high: number;
+      low: number;
+    };
+
+function longToPlain(long: Ice.Long): PlainLong {
   // serialize to number if possible
   const value = long.toNumber();
 
@@ -147,7 +158,12 @@ function longFromPlain(plainLong: any): Ice.Long {
   }
 }
 
-function enumToPlain(enumValue: Ice.EnumBase<string>): any {
+export type PlainEnum = {
+  [TYPE_KEY]: string;
+  value: string;
+};
+
+function enumToPlain(enumValue: Ice.EnumBase<string>): PlainEnum {
   const {name} = enumValue;
   const value = name[0] === '_' ? name.substr(1) : name;
   return {
@@ -169,7 +185,12 @@ function enumFromPlain(
   return constructor[plainEnum.value] || constructor['_' + plainEnum.value];
 }
 
-function proxyToPlain(proxy: Ice.ObjectPrx): any {
+export type PlainProxy = {
+  [TYPE_KEY]: string;
+  value: string;
+};
+
+function proxyToPlain(proxy: Ice.ObjectPrx): PlainProxy {
   return {
     [TYPE_KEY]: getType(proxy),
     value: proxy.toString(),
@@ -183,6 +204,11 @@ function proxyToJson(proxy: Ice.ObjectPrx) {
 
 const MAP_TYPE = 'Map';
 export {MAP_TYPE};
+
+export type PlainMap<V = any> = {
+  [TYPE_KEY]: typeof MAP_TYPE;
+  entries: {[keyJson: string]: V};
+};
 
 function stringifyMapKey(
   key: string | number | boolean | Ice.EnumBase<string>,
@@ -202,10 +228,10 @@ function stringifyMapKey(
 function mapToPlain(
   map: Map<string | number | boolean | Ice.EnumBase<string>, any>,
   customizer: Customizer,
-): any {
+): PlainMap {
   const entries: {[key: string]: any} = {};
 
-  const ret = {
+  const ret: PlainMap = {
     [TYPE_KEY]: MAP_TYPE,
     entries,
   };
@@ -259,13 +285,18 @@ function mapFromPlain(
 const HASH_MAP_TYPE = 'Ice.HashMap';
 export {HASH_MAP_TYPE};
 
+export type PlainHashMap<K = any, V = any> = {
+  [TYPE_KEY]: typeof HASH_MAP_TYPE;
+  entries: Array<{key: K; value: V}>;
+};
+
 function hashMapToPlain(
   hashMap: Ice.HashMap<Ice.HashMapKey, any>,
   customizer: Customizer,
-): any {
+): PlainHashMap {
   const entries: Array<{key: any; value: any}> = [];
 
-  const ret = {
+  const ret: PlainHashMap = {
     [TYPE_KEY]: HASH_MAP_TYPE,
     entries,
   };
@@ -329,7 +360,12 @@ function hashMapFromPlain(
 const SET_TYPE = 'Set';
 export {SET_TYPE};
 
-function setToPlain(set: Set<any>, customizer: Customizer): any {
+export type PlainSet<V = any> = {
+  [TYPE_KEY]: typeof SET_TYPE;
+  value: V[];
+};
+
+function setToPlain(set: Set<any>, customizer: Customizer): PlainSet {
   const values: any[] = [];
 
   for (const item of set) {
