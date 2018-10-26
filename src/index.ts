@@ -43,6 +43,7 @@ function cacheConstructors(iceModule: {[key: string]: any}, prefix?: string) {
       if (
         isStructConstructor(value) ||
         isEnumConstructor(value) ||
+        value === Value ||
         value.prototype instanceof Value ||
         value.prototype instanceof Exception ||
         value.prototype instanceof ObjectPrx
