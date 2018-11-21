@@ -693,6 +693,11 @@ export function iceToJson(
 
   switch (typeof value) {
     case 'number':
+      if (isFinite(value)) {
+        return '' + value;
+      } else {
+        return 'null';
+      }
     case 'boolean':
       return '' + value;
     case 'string':
