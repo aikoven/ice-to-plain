@@ -18,7 +18,8 @@
     "prepare": "npm test && npm run clean && npm run build"
   },
   "dependencies": {
-    "ice": "~3.7.0"
+    "ice": "~3.7.0",
+    "json-stringifier": "^0.1.0"
   },
   "devDependencies": {
     "@types/jest": "^22.0.1",

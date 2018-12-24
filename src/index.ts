@@ -1,4 +1,7 @@
 import {Ice} from 'ice';
+import {stringify, Stringifier} from 'json-stringifier';
+
+export {Stringifier};
 
 import Long = Ice.Long;
 import EnumBase = Ice.EnumBase;
@@ -199,7 +202,7 @@ function proxyToPlain(proxy: Ice.ObjectPrx): PlainProxy {
 }
 
 function proxyToJson(proxy: Ice.ObjectPrx) {
-  const valueJson = stringToJson(proxy.toString());
+  const valueJson = stringify(proxy.toString());
   return `{"@@type":"${getType(proxy)}","value":${valueJson}}`;
 }
 
@@ -220,7 +223,7 @@ function stringifyMapKey(
     case 'boolean':
       return '' + key;
     case 'string':
-      return stringToJson(key as string);
+      return stringify(key as string)!;
     default:
       return stringifier(key)!;
   }
@@ -261,7 +264,7 @@ function mapToJson(
     if (comma) {
       ret += ',';
     }
-    ret += stringToJson(stringifyMapKey(key, stringifier)) + ':' + valueJson;
+    ret += stringify(stringifyMapKey(key, stringifier)) + ':' + valueJson;
     comma = true;
   }
 
@@ -562,72 +565,6 @@ function mapValues(
   return ret;
 }
 
-// copied from pino
-//
-// magically escape strings for json
-// relying on their charCodeAt
-// everything below 32 needs JSON.stringify()
-// 34 and 92 happens all the time, so we
-// have a fast case for them
-function stringToJson(str: string) {
-  var result = '';
-  var last = 0;
-  var found = false;
-  var point = 255;
-  const l = str.length;
-  if (l > 100) {
-    return JSON.stringify(str);
-  }
-  for (var i = 0; i < l && point >= 32; i++) {
-    point = str.charCodeAt(i);
-    if (point === 34 || point === 92) {
-      result += str.slice(last, i) + '\\';
-      last = i;
-      found = true;
-    }
-  }
-  if (!found) {
-    result = str;
-  } else {
-    result += str.slice(last);
-  }
-  return point < 32 ? JSON.stringify(str) : '"' + result + '"';
-}
-
-function arrayToJson(array: Array<any>, stringifier: Stringifier): string {
-  let ret = '[';
-  let comma = false;
-  for (const item of array) {
-    const itemJson = stringifier(item);
-    if (comma) {
-      ret += ',';
-    }
-    ret += itemJson === undefined ? 'null' : itemJson;
-    comma = true;
-  }
-  return ret + ']';
-}
-
-function plainObjectToJson(
-  obj: {[key: string]: any},
-  stringifier: Stringifier,
-): string {
-  let ret = '{';
-  let comma = false;
-  for (const key of Object.keys(obj)) {
-    const valueJson = stringifier((obj as any)[key]);
-    if (valueJson === undefined) {
-      continue;
-    }
-    if (comma) {
-      ret += ',';
-    }
-    ret += stringToJson(key) + ':' + valueJson;
-    comma = true;
-  }
-  return ret + '}';
-}
-
 export type Customizer = (value: any) => any;
 
 export function iceToPlain(
@@ -681,72 +618,45 @@ export function iceToPlain(
   return mapValues(iceValue, customizer);
 }
 
-export type Stringifier = (value: any) => string | undefined;
-
 export function iceToJson(
   value: any,
   stringifier: Stringifier = iceToJson,
 ): string | undefined {
-  if (value === undefined) {
-    return undefined;
+  if (typeof value === 'object' && value !== null) {
+    if (value instanceof Long) {
+      return longToJson(value);
+    }
+
+    if (value instanceof EnumBase) {
+      return enumToJson(value);
+    }
+
+    if (
+      value instanceof Value ||
+      value instanceof Exception ||
+      isStructConstructor(value.constructor)
+    ) {
+      return objectToJson(value as any, stringifier);
+    }
+
+    if (value instanceof ObjectPrx) {
+      return proxyToJson(value);
+    }
+
+    if (value instanceof Map) {
+      return mapToJson(value, stringifier);
+    }
+
+    if (value instanceof HashMap) {
+      return hashMapToJson(value, stringifier);
+    }
+
+    if (value instanceof Set) {
+      return setToJson(value, stringifier);
+    }
   }
 
-  switch (typeof value) {
-    case 'number':
-      if (isFinite(value)) {
-        return '' + value;
-      } else {
-        return 'null';
-      }
-    case 'boolean':
-      return '' + value;
-    case 'string':
-      return stringToJson(value as string);
-    case 'object':
-      if (value === null) {
-        return 'null';
-      }
-
-      if (value instanceof Long) {
-        return longToJson(value);
-      }
-
-      if (value instanceof EnumBase) {
-        return enumToJson(value);
-      }
-
-      if (
-        value instanceof Value ||
-        value instanceof Exception ||
-        isStructConstructor(value.constructor)
-      ) {
-        return objectToJson(value as any, stringifier);
-      }
-
-      if (value instanceof ObjectPrx) {
-        return proxyToJson(value);
-      }
-
-      if (value instanceof Map) {
-        return mapToJson(value, stringifier);
-      }
-
-      if (value instanceof HashMap) {
-        return hashMapToJson(value, stringifier);
-      }
-
-      if (value instanceof Set) {
-        return setToJson(value, stringifier);
-      }
-
-      if (Array.isArray(value)) {
-        return arrayToJson(value, stringifier);
-      }
-
-      return plainObjectToJson(value, stringifier);
-  }
-
-  return undefined;
+  return stringify(value, stringifier);
 }
 
 export function iceFromPlain(
