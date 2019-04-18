@@ -161,10 +161,31 @@ test('Value', () => {
   expectEqual(iceFromPlain(valuePlain), value);
 });
 
+test('Value base', () => {
+  const value = new Ice.Value();
+
+  const valuePlain = iceToPlain(value);
+  expect(valuePlain).toMatchSnapshot();
+  expect(iceToJson(value)).toEqual(JSON.stringify(valuePlain));
+  expectEqual(iceFromPlain(valuePlain), value);
+});
+
 test('Proxy', () => {
   const communicator = Ice.initialize();
   const proxy = Ice.LocatorPrx.uncheckedCast(
     communicator.stringToProxy('Category/Name:tcp -h blabla -p 1234')!,
+  );
+
+  const proxyPlain = iceToPlain(proxy);
+  expect(proxyPlain).toMatchSnapshot();
+  expect(iceToJson(proxy)).toEqual(JSON.stringify(proxyPlain));
+  expect(() => iceFromPlain(proxyPlain)).toThrowError();
+});
+
+test('Proxy base', () => {
+  const communicator = Ice.initialize();
+  const proxy = communicator.stringToProxy(
+    'Category/Name:tcp -h blabla -p 1234',
   );
 
   const proxyPlain = iceToPlain(proxy);

@@ -47,6 +47,7 @@ function cacheConstructors(iceModule: {[key: string]: any}, prefix?: string) {
         isStructConstructor(value) ||
         isEnumConstructor(value) ||
         value === Value ||
+        value === ObjectPrx ||
         value.prototype instanceof Value ||
         value.prototype instanceof Exception ||
         value.prototype instanceof ObjectPrx
@@ -79,6 +80,14 @@ function getType(
   }
 
   if (type == null) {
+    if (value instanceof ObjectPrx) {
+      const constructor = value.constructor as Ice.ObjectPrxConstructor<
+        Ice.ObjectPrx
+      >;
+      throw new Error(
+        `Could not find type for proxy ${constructor.ice_staticId()} ${value.toString()}`,
+      );
+    }
     throw new Error(`Could not find type for ${JSON.stringify(value)}`);
   }
 

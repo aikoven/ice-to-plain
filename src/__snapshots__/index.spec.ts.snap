@@ -185,6 +185,13 @@ Object {
 }
 `;
 
+exports[`Proxy base 1`] = `
+Object {
+  "@@type": "Ice.ObjectPrx",
+  "value": "Category/Name -t -e 1.1:tcp -h blabla -p 1234 -t 60000",
+}
+`;
+
 exports[`Set 1`] = `
 Object {
   "@@type": "Set",
@@ -220,6 +227,12 @@ Object {
     "@@type": "Ice.Long",
     "value": 42,
   },
+}
+`;
+
+exports[`Value base 1`] = `
+Object {
+  "@@type": "Ice.Value",
 }
 `;
 
