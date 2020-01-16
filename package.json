@@ -15,7 +15,7 @@
     "clean": "rimraf lib",
     "test": "jest",
     "build": "tsc -P tsconfig.build.json",
-    "prepare": "npm test && npm run clean && npm run build"
+    "prepublishOnly": "npm test && npm run clean && npm run build"
   },
   "dependencies": {
     "ice": "~3.7.0",
