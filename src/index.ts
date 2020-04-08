@@ -30,6 +30,13 @@ function isEnumConstructor(constructor: Function) {
   );
 }
 
+function isProxyConstructor(constructor: Function) {
+  return (
+    constructor != null &&
+    (constructor as any).uncheckedCast === ObjectPrx.uncheckedCast
+  );
+}
+
 // hack to get an object containing all top-level Slice modules
 const rootIceModule = (Ice as any)._ModuleRegistry.type({split: () => []});
 
@@ -249,7 +256,7 @@ function mapToPlain(
     entries,
   };
 
-  const stringifier: Stringifier = value => JSON.stringify(customizer(value));
+  const stringifier: Stringifier = (value) => JSON.stringify(customizer(value));
 
   for (const [key, value] of map.entries()) {
     entries[stringifyMapKey(key, stringifier)] = customizer(value);
@@ -671,6 +678,7 @@ export function iceToJson(
 export function iceFromPlain(
   plainValue: any,
   customizer: Customizer = iceFromPlain,
+  communicator?: Ice.Communicator,
 ): any {
   if (plainValue === null || typeof plainValue !== 'object') {
     return plainValue;
@@ -706,11 +714,17 @@ export function iceFromPlain(
     return setFromPlain(plainValue, customizer);
   }
 
-  if (iceType.endsWith('Prx')) {
-    throw new Error('Converting proxies from plain is not supported');
-  }
-
   const constructor = getConstructor(iceType);
+
+  if (isProxyConstructor(constructor)) {
+    if (communicator == null) {
+      throw new Error('Converting proxies from plain requires a communicator');
+    }
+
+    return constructor.uncheckedCast(
+      communicator.stringToProxy(plainValue.value),
+    );
+  }
 
   if (isEnumConstructor(constructor)) {
     return enumFromPlain(constructor, plainValue);

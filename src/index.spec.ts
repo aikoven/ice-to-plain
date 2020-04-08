@@ -180,6 +180,9 @@ test('Proxy', () => {
   expect(proxyPlain).toMatchSnapshot();
   expect(iceToJson(proxy)).toEqual(JSON.stringify(proxyPlain));
   expect(() => iceFromPlain(proxyPlain)).toThrowError();
+  expect(iceFromPlain(proxyPlain, undefined, communicator).equals(proxy)).toBe(
+    true,
+  );
 });
 
 test('Proxy base', () => {
