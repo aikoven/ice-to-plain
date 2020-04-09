@@ -677,7 +677,8 @@ export function iceToJson(
 
 export function iceFromPlain(
   plainValue: any,
-  customizer: Customizer = iceFromPlain,
+  customizer: Customizer = (value) =>
+    iceFromPlain(value, undefined, communicator),
   communicator?: Ice.Communicator,
 ): any {
   if (plainValue === null || typeof plainValue !== 'object') {

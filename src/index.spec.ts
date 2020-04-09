@@ -183,6 +183,13 @@ test('Proxy', () => {
   expect(iceFromPlain(proxyPlain, undefined, communicator).equals(proxy)).toBe(
     true,
   );
+
+  // nested proxy
+  expect(
+    iceFromPlain({proxy: proxyPlain}, undefined, communicator).proxy.equals(
+      proxy,
+    ),
+  ).toBe(true);
 });
 
 test('Proxy base', () => {
