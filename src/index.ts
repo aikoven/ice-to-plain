@@ -92,10 +92,10 @@ function getType(
         Ice.ObjectPrx
       >;
       throw new Error(
-        `Could not find type for proxy ${constructor.ice_staticId()} ${value.toString()}`,
+        `Could not find type for proxy ${constructor.ice_staticId()} ${value.toString()}. Make sure that compiled slice module is imported.`,
       );
     }
-    throw new Error(`Could not find type for ${JSON.stringify(value)}`);
+    throw new Error(`Could not find type for ${JSON.stringify(value)}. Make sure that compiled slice module is imported.`);
   }
 
   return type;
@@ -112,7 +112,7 @@ function getConstructor(type: string): any {
   }
 
   if (typeof result !== 'function') {
-    throw new Error(`Could not find constructor for type ${type}`);
+    throw new Error(`Could not find constructor for type ${type}. Make sure that compiled slice module is imported.`);
   }
 
   return result;
